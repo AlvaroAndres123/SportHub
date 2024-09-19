@@ -2,7 +2,7 @@ import React from 'react';
 
 const Welcome = () => {
   return (
-    <div className="bg-gray-100 p-6 sm:p-8 lg:p-10 rounded-lg shadow-lg text-center max-w-4xl mx-auto mt-[-50px]">
+    <div className="bg-gray-100 p-6 sm:p-8 lg:p-10 rounded-lg shadow-lg text-center max-w-4xl mx-auto mt-[-30px] sm:mt-[-40px] lg:mt-[-50px]">
       <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-4">
         ¡Bienvenido a SportHub!
       </h1>
