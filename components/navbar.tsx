@@ -11,24 +11,24 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="sticky top-0 z-50 bg-[#333333] text-white w-full">
+        <nav className="sticky top-0 z-50 bg-secondary text-white w-full">
             <div className="container mx-auto flex justify-between items-center p-4">
           
                 <div className="text-xl font-bold">
-                    <Link className="hover:text-[#facc15]" href="/">
+                    <Link className="hover:text-primary" href="/">
                         SportHub
                     </Link>
                 </div>
 
               
                 <div className="hidden md:flex gap-6">
-                    <Link className="hover:text-[#facc15]" href="/calendario">
+                    <Link className="hover:text-primary" href="/calendario">
                         Calendario
                     </Link>
-                    <Link className="hover:text-[#facc15]" href="/rankings">
+                    <Link className="hover:text-primary" href="/rankings">
                         Rankings
                     </Link>
-                    <Link className="hover:text-[#facc15]" href="/torneos">
+                    <Link className="hover:text-primary" href="/torneos">
                         Torneos
                     </Link>
                 </div>
@@ -51,13 +51,13 @@ const Navbar = () => {
           
             {isOpen && (
                 <div className="md:hidden absolute top-full inset-x-0 bg-[#333333] w-full text-white flex flex-col items-center space-y-4 py-4">
-                    <Link onClick={toggleMenu} className="hover:text-[#facc15]" href="/calendario">
+                    <Link onClick={toggleMenu} className="hover:text-primary" href="/calendario">
                         Calendario
                     </Link>
-                    <Link onClick={toggleMenu} className="hover:text-[#facc15]" href="/rankings">
+                    <Link onClick={toggleMenu} className="hover:text-primary" href="/rankings">
                         Rankings
                     </Link>
-                    <Link onClick={toggleMenu} className="hover:text-[#facc15]" href="/torneos">
+                    <Link onClick={toggleMenu} className="hover:text-primary" href="/torneos">
                         Torneos
                     </Link>
                     <Link onClick={toggleMenu} className="bg-yellow-400 text-white py-2 px-6 rounded-full hover:bg-yellow-500 transition-all duration-300" href="/login">
