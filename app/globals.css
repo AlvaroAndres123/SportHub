@@ -40,6 +40,6 @@ body {
 
 @media (max-width: 768px) {
   .bgimage {
-    background: linear-gradient(to bottom, #252525 30%, #facc15);
+    background: linear-gradient(to bottom right, #252525 50%, #facc15 50%);
   }
 }
