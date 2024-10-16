@@ -1,7 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation';
 import React from 'react';
-import Form from '@/components/auth/form';
+import Form from '@/app/(auth)/register/form';
 import BackButton from '@/components/auth/backbutton';
 
 const Register: React.FC = () => {
