@@ -1,10 +1,10 @@
 'use client'
 import { useRouter } from 'next/navigation';
 import React from 'react';
-import Form from '@/app/(auth)/register/form';
+import Form from './form';
 import BackButton from '@/components/auth/backbutton';
 
-const Register: React.FC = () => {
+const Login: React.FC = () => {
      const router = useRouter()
 
      const handleBackClick = () => {
@@ -24,4 +24,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register;
+export default Login;
