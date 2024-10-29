@@ -27,7 +27,8 @@ const handler = NextAuth({
     if(passwordCorrect){
         return{
             id: user.idusers,
-            email: user.email
+            email: user.email,
+            name: user.name
         };
     }
             return null

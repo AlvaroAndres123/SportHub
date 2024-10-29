@@ -2,15 +2,15 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import { useSession, getSession } from "next-auth/react"
+import { useSession } from "next-auth/react";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const { data: session } = useSession();
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
+  const toggleMenu = () => setIsOpen(!isOpen);
+  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
   return (
     <nav className="sticky top-0 z-50 bg-secondary text-white w-full">
@@ -31,11 +31,31 @@ const Navbar: React.FC = () => {
             Torneos
           </Link>
         </div>
-        <div className="hidden md:flex gap-6 items-center">
+        <div className="hidden md:flex gap-6 items-center relative">
           {session ? (
-            <button onClick={() => signOut()} className="bg-yellow-400 text-white py-2 px-6 rounded-full hover:bg-yellow-500 transition-all duration-300">
-              Cerrar Sesión
-            </button>
+            <div className="flex items-center gap-2">
+              <span>Bienvenido, {session.user?.name}</span>
+              <button onClick={toggleDropdown} className="relative focus:outline-none">
+                <img
+                  src={session.user?.image || "/img/default-avatar.png"}
+                  alt="Avatar"
+                  className="w-8 h-8 rounded-full cursor-pointer"
+                />
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg py-2">
+                    <Link href="/pages/player" className="block px-4 py-2 hover:bg-gray-100">
+                      Configuración
+                    </Link>
+                    <button
+                      onClick={() => signOut()}
+                      className="text-left px-4 py-2 hover:bg-gray-100"
+                    >
+                      Cerrar Sesión
+                    </button>
+                  </div>
+                )}
+              </button>
+            </div>
           ) : (
             <>
               <Link className="bg-yellow-400 text-white py-2 px-6 rounded-full hover:bg-yellow-500 transition-all duration-300" href="/pages/login">
@@ -65,15 +85,36 @@ const Navbar: React.FC = () => {
             Torneos
           </Link>
           {session ? (
-            <button onClick={() => { signOut(); toggleMenu(); }} className="bg-yellow-400 text-white py-2 px-6 rounded-full hover:bg-yellow-500 transition-all duration-300">
-              Cerrar Sesión
-            </button>
+            <>
+              <div className="flex items-center gap-2">
+                <span>Bienvenido, {session.user?.name}</span>
+                <img
+                  src={session.user?.image || "/default-avatar.png"}
+                  alt="Avatar"
+                  className="w-8 h-8 rounded-full cursor-pointer"
+                  onClick={toggleDropdown}
+                />
+              </div>
+              {dropdownOpen && (
+                <div className="flex flex-col space-y-2 mt-4">
+                  <Link onClick={toggleMenu} href="/configuracion" className="hover:text-primary">
+                    Configuración
+                  </Link>
+                  <button
+                    onClick={() => { signOut(); toggleMenu(); }}
+                    className="text-left w-full hover:text-primary"
+                  >
+                    Cerrar Sesión
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <>
               <Link onClick={toggleMenu} className="bg-yellow-400 text-white py-2 px-6 rounded-full hover:bg-yellow-500 transition-all duration-300" href="/pages/login">
                 Iniciar Sesión
               </Link>
-              <Link className="bg-yellow-400 text-white py-2 px-6 rounded-full hover:bg-yellow-500 transition-all duration-300" href="/pages/register">
+              <Link onClick={toggleMenu} className="bg-yellow-400 text-white py-2 px-6 rounded-full hover:bg-yellow-500 transition-all duration-300" href="/pages/register">
                 Crear Cuenta
               </Link>
             </>
