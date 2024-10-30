@@ -16,7 +16,7 @@ const Form: React.FC = () => {
       body: JSON.stringify({
         email: formData.get('email'),
         password: formData.get('password'),
-        username: formData.get('username'),
+        name: formData.get('username'),
         user_image: '/img/avatar-default.png', 
       }),
     });
