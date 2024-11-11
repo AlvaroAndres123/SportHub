@@ -1,9 +1,12 @@
-'use client'
+'use client';
 
 import { FormEvent } from 'react';
 import React from 'react';
+import { useRouter } from 'next/navigation'; 
 
 const Form: React.FC = () => {
+  const router = useRouter(); 
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -17,11 +20,15 @@ const Form: React.FC = () => {
         email: formData.get('email'),
         password: formData.get('password'),
         name: formData.get('username'),
-        user_image: '/img/avatar-default.png', 
+        user_image: '/img/default-avatar.jpg', 
       }),
     });
 
-    console.log({ response });
+    if (response.ok) {
+      router.push('/'); 
+    } else {
+      console.log('Error creating account:', response.statusText);
+    }
   };
 
   return (

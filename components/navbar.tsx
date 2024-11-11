@@ -21,13 +21,13 @@ const Navbar: React.FC = () => {
           </Link>
         </div>
         <div className="hidden md:flex gap-6">
-          <Link className="hover:text-primary" href="/calendario">
+          <Link className="hover:text-primary" href="/pages/Functions/Calendar">
             Calendario
           </Link>
-          <Link className="hover:text-primary" href="/rankings">
+          <Link className="hover:text-primary" href="/pages/Functions/Ranking">
             Rankings
           </Link>
-          <Link className="hover:text-primary" href="/torneos">
+          <Link className="hover:text-primary" href="/pages/Functions/Tournaments">
             Torneos
           </Link>
         </div>
@@ -37,7 +37,7 @@ const Navbar: React.FC = () => {
               <span>Bienvenido, {session.user?.name}</span>
               <button onClick={toggleDropdown} className="relative focus:outline-none">
                 <img
-                  src={session.user?.image || "/img/default-avatar.png"}
+                  src={session.user?.image || "/img/default-avatar.jpg"}
                   alt="Avatar"
                   className="w-8 h-8 rounded-full cursor-pointer"
                 />
@@ -75,13 +75,13 @@ const Navbar: React.FC = () => {
       </div>
       {isOpen && (
         <div className="md:hidden absolute top-full inset-x-0 bg-[#333333] w-full text-white flex flex-col items-center space-y-4 py-4">
-          <Link onClick={toggleMenu} className="hover:text-primary" href="/calendario">
+          <Link onClick={toggleMenu} className="hover:text-primary" href="/pages/Functions/Calendar">
             Calendario
           </Link>
-          <Link onClick={toggleMenu} className="hover:text-primary" href="/rankings">
+          <Link onClick={toggleMenu} className="hover:text-primary" href="/pages/Functions/Ranking">
             Rankings
           </Link>
-          <Link onClick={toggleMenu} className="hover:text-primary" href="/torneos">
+          <Link onClick={toggleMenu} className="hover:text-primary" href="/pages/Functions/Tournaments">
             Torneos
           </Link>
           {session ? (

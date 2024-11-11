@@ -1,36 +1,25 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import ProfileForm from '@/components/auth/ProfileForm';
+import BackButton from '@/components/auth/backbutton';
 
 const Configuracion = () => {
-    const { data: session } = useSession();
-    const [name, setName] = useState('');
-    const [userImage, setUserImage] = useState<File | null>(null);
+    const router = useRouter();
 
-    useEffect(() => {
-        if (session?.user) {
-            setName(session.user.name || '');
-        }
-    }, [session]);
+    const handleBackClick = () => {
+        router.push('/'); 
+    };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!session || !session.user) return;
-
-        const formData = new FormData();
-        formData.append('id', session.user.id);
-        formData.append('name', name);
-        if (userImage) formData.append('user_image', userImage);
-
+    const handleFormSubmit = async (formData: FormData) => {
         const response = await fetch('/api/users', {
             method: 'PATCH',
             body: formData,
         });
 
-
-        const responseBody = await response.text(); 
-        console.log(responseBody); 
+        const responseBody = await response.text();
+        console.log(responseBody);
 
         if (response.ok) {
             alert('Perfil actualizado con éxito');
@@ -40,28 +29,17 @@ const Configuracion = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="configuracion-form">
-            <div>
-                <label htmlFor="name">Nombre:</label>
-                <input
-                    type="text"
-                    id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                />
+        <div className="bgimage">
+            <BackButton
+                onClick={handleBackClick}
+                className="text-white font-extrabold"
+            />
+
+             <div className='flex justify-center items-center mt-[50%] md:mt-[18%] '>
+            <ProfileForm onSubmit={handleFormSubmit} />
             </div>
-            <div>
-                <label htmlFor="userImage">Imagen de perfil:</label>
-                <input
-                    type="file"
-                    id="userImage"
-                    accept="image/*"
-                    onChange={(e) => setUserImage(e.target.files?.[0] || null)}
-                />
-            </div>
-            <button type="submit">Actualizar Perfil</button>
-        </form>
+            
+        </div>
     );
 };
 
