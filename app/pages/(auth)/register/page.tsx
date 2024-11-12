@@ -17,7 +17,7 @@ const Register: React.FC = () => {
         onClick={handleBackClick}
         className="text-white font-extrabold"
       />
-      <div className='flex justify-center items-center mt-[50%] md:mt-[18%] '>
+      <div className='flex justify-center items-center mt-[40%] md:mt-[14%] '>
         <Form />
       </div>
     </div>

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@vercel/postgres';
-import { Buffer } from 'buffer';
-
 
 export async function GET(req: NextRequest) {
   let client;
@@ -17,17 +15,21 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const { id, name, user_image } = await req.json();
+  const { id, name} = await req.json(); 
   let client;
+  
+
+  if (!id || !name ) {
+    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+  }
+
   try {
     client = await db.connect();
 
-
-    const imageBuffer = Buffer.from(user_image.split(',')[1], 'base64');
-
+  
     await client.query(
-      'UPDATE users SET name = $1, user_image = $2 WHERE idusers = $3',
-      [name, imageBuffer, id]
+      'UPDATE users SET name = $1 WHERE idusers = $2',
+      [name, id] 
     );
 
     client.release();
