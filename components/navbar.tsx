@@ -15,7 +15,7 @@ const Navbar: React.FC = () => {
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
   return (
-    <nav className="sticky top-0 z-50 bg-black text-white shadow-lg w-full">
+    <nav className="sticky top-0 z-50 bg-black bg-opacity-90 text-white shadow-xl w-full">
       <div className="container mx-auto flex justify-between items-center p-4">
         <div className="text-3xl font-semibold tracking-wide">
           <Link className="hover:text-yellow-400 transition-all duration-300" href="/">
