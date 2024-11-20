@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 
 interface ProfileFormProps {
@@ -12,21 +12,21 @@ interface ProfileFormProps {
 
 const ProfileForm: React.FC<ProfileFormProps> = ({ initialValues }) => {
   const { data: session } = useSession();
-  const [name, setName] = useState(initialValues.name || ''); 
+  const [name, setName] = useState(initialValues.name || '');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!session || !session.user) {
+      alert('Sesión no encontrada.');
       return;
     }
 
-    // Si no hay nombre o ID, mostramos una alerta
     if (!name || !session.user.id) {
       alert('Por favor, ingresa un nombre válido');
       return;
     }
 
-    // Creamos el objeto con los datos a enviar
     const data = {
       id: session.user.id,
       name: name,
@@ -42,16 +42,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ initialValues }) => {
       });
 
       if (response.ok) {
+
         alert('Perfil actualizado con éxito');
-        const updatedUser = await response.json();
-
-        // Aquí actualizamos la sesión con los nuevos datos del usuario
-        await signIn('credentials', {
-          redirect: false, // Evitamos la redirección automática
-          user: updatedUser, // Pasamos los nuevos datos de usuario
-        });
-
-        // Opcionalmente, puedes actualizar el estado local si es necesario
       } else {
         alert('Error al actualizar el perfil');
       }
