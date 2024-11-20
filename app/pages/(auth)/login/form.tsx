@@ -25,7 +25,6 @@ const Form: React.FC = () => {
       redirect: false,
     });
 
- 
     if (response?.error) {
       setError('Correo o contraseña incorrectos.');
     } else {
@@ -36,41 +35,41 @@ const Form: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className='w-96 p-6 shadow-lg bg-white rounded-lg'>
-      <h1 className='subtitle text-center'>Inicia Sesión</h1>
+    <form onSubmit={handleSubmit} className='w-96 p-8 bg-white rounded-lg shadow-2xl'>
+      <h1 className='text-3xl font-semibold text-center mb-6 text-gray-800'>Inicia Sesión</h1>
 
       {/* Mensaje de error */}
-      {error && <div className="text-red-500 text-center mb-4">{error}</div>}
+      {error && <div className="text-red-500 text-center mb-4 font-medium">{error}</div>}
 
-      <div className='mt-3'>
-        <label htmlFor="email" className='block text-base mb-2'>Correo Electrónico</label>
+      <div className='mt-4'>
+        <label htmlFor="email" className='block text-sm font-medium text-gray-700 mb-2'>Correo Electrónico</label>
         <input
           name='email'
-          type="text"
+          type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className='border w-full text-base px-2 py-1 focus:outline-none focus:ring-0 focus:border-gray-600'
+          className='border w-full text-base px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all duration-300'
           placeholder='Pon tu correo...'
         />
       </div>
       
-      <div className='mt-3'>
-        <label htmlFor="password" className='block text-base mb-2'>Contraseña</label>
+      <div className='mt-4'>
+        <label htmlFor="password" className='block text-sm font-medium text-gray-700 mb-2'>Contraseña</label>
         <input
           name='password'
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className='border w-full text-base px-2 py-1 focus:outline-none focus:ring-0 focus:border-gray-600'
+          className='border w-full text-base px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all duration-300'
           placeholder='Pon tu contraseña...'
         />
       </div>
 
-      <div className='flex justify-center mt-3'>
+      <div className='flex justify-center mt-6'>
         <button
           type='submit'
           disabled={!email || !password} 
-          className={`bg-yellow-400 text-white py-2 px-4 sm:px-6 rounded-full hover:bg-yellow-500 transition-all duration-300 ${(!email || !password) ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-yellow-400 text-white py-2 px-6 rounded-full hover:bg-yellow-500 transition-all duration-300 ${(!email || !password) ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           Iniciar Sesión
         </button>

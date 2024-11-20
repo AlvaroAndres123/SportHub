@@ -18,7 +18,7 @@ const Welcome = () => {
       <Button 
         text="Descubre más" 
         className="bg-yellow-500 text-white py-3 px-8 rounded-full text-xl font-semibold hover:bg-yellow-600 transition-all duration-300 transform hover:scale-105 animate__animated animate__fadeIn animate__delay-3s"
-        onClick={() => alert('¡Aventura a SportHub!')}
+        onClick={() => alert('¡El Sukrol Es mi Pasion!')}
       />
     </div>
   );

@@ -28,43 +28,49 @@ const Page = () => {
   const filteredEvents = events.filter(event => event.date === selectedDate);
 
   return (
-    <div className="relative min-h-screen bg-gray-50">
+    <div className="relative min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       {/* Navbar */}
       <Navbar />
 
       {/* Título principal */}
-      <h1 className="text-3xl font-bold text-center mt-8 text-gray-800">Calendario de Eventos</h1>
+      <h1 className="text-4xl font-extrabold text-center mt-10 text-gray-900">Calendario de Eventos</h1>
 
-      {/* Calendario (solo presentación, sin interacción real) */}
-      <div className="flex justify-center mt-6">
+      {/* Sección para seleccionar una fecha */}
+      <div className="flex justify-center mt-8 space-x-4">
         <button
           onClick={() => setSelectedDate('2024-11-15')}
-          className={`px-6 py-2 mx-2 rounded-lg ${selectedDate === '2024-11-15' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+          className={`px-8 py-3 rounded-lg text-lg font-medium transition-all duration-300 ease-in-out 
+            ${selectedDate === '2024-11-15' ? 'bg-yellow-500 text-white transform scale-105' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
         >
           15 Nov 2024
         </button>
         <button
           onClick={() => setSelectedDate('2024-11-18')}
-          className={`px-6 py-2 mx-2 rounded-lg ${selectedDate === '2024-11-18' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+          className={`px-8 py-3 rounded-lg text-lg font-medium transition-all duration-300 ease-in-out 
+            ${selectedDate === '2024-11-18' ? 'bg-yellow-500 text-white transform scale-105' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
         >
           18 Nov 2024
         </button>
         <button
           onClick={() => setSelectedDate('2024-11-20')}
-          className={`px-6 py-2 mx-2 rounded-lg ${selectedDate === '2024-11-20' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+          className={`px-8 py-3 rounded-lg text-lg font-medium transition-all duration-300 ease-in-out 
+            ${selectedDate === '2024-11-20' ? 'bg-yellow-500 text-white transform scale-105' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
         >
           20 Nov 2024
         </button>
         <button
           onClick={() => setSelectedDate('2024-11-25')}
-          className={`px-6 py-2 mx-2 rounded-lg ${selectedDate === '2024-11-25' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+          className={`px-8 py-3 rounded-lg text-lg font-medium transition-all duration-300 ease-in-out 
+            ${selectedDate === '2024-11-25' ? 'bg-yellow-500 text-white transform scale-105' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
         >
           25 Nov 2024
         </button>
       </div>
 
       {/* Componente para mostrar los eventos filtrados */}
-      <EventList filteredEvents={filteredEvents} selectedDate={selectedDate} />
+      <div className="mt-10 max-w-4xl mx-auto">
+        <EventList filteredEvents={filteredEvents} selectedDate={selectedDate} />
+      </div>
     </div>
   );
 };

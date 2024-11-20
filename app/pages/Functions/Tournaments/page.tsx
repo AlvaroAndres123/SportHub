@@ -6,7 +6,7 @@ import AddButton from '@/components/add';
 import ModalEventOrg from '@/components/functions/ModalEventOrg';
 import ModalEventPlayer from '@/components/functions/ModalEventPl';
 import { useSession } from 'next-auth/react';
-import Link from 'next/link'; // Importa Link para redirección
+import Link from 'next/link';
 
 interface Event {
   id: number;
@@ -70,14 +70,14 @@ const Page = () => {
   };
 
   if (status === 'loading' || isLoading) {
-    return <div className="min-h-screen flex justify-center items-center">Cargando...</div>;
+    return <div className="min-h-screen flex justify-center items-center text-xl font-semibold text-gray-700">Cargando...</div>;
   }
 
   if (!session) {
     return (
-      <div className="min-h-screen flex flex-col justify-center items-center text-center">
-        <p className="text-gray-600 text-lg mb-4">No has iniciado sesión.</p>
-        <Link className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded" href="/">
+      <div className="min-h-screen flex flex-col justify-center items-center text-center bg-gray-50 py-12">
+        <p className="text-xl text-gray-600 mb-4">No has iniciado sesión.</p>
+        <Link className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300" href="/">
           Volver al inicio
         </Link>
       </div>
@@ -87,18 +87,18 @@ const Page = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <h1 className="text-3xl font-bold text-center mt-8 text-gray-800">Eventos de Torneos</h1>
+      <h1 className="text-4xl font-extrabold text-center mt-8 text-gray-800">Eventos de Torneos</h1>
 
       {/* Lista de eventos */}
-      <div className="mt-8 mx-4">
+      <div className="mt-8 mx-4 lg:mx-16">
         {events.length === 0 ? (
-          <p className="text-center text-gray-500">No hay eventos creados todavía.</p>
+          <p className="text-center text-gray-500 text-lg">No hay eventos creados todavía.</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {events.map((event) => (
-              <div key={event.id} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition">
-                <h3 className="text-xl font-semibold text-yellow-500">{event.name}</h3>
-                <p className="text-gray-700 mt-2">{event.date}</p>
+              <div key={event.id} className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                <h3 className="text-2xl font-semibold text-yellow-600 mb-3 hover:text-yellow-500 transition-all duration-200">{event.name}</h3>
+                <p className="text-gray-700">{event.date}</p>
                 <p className="text-gray-600 mt-2">{event.description}</p>
               </div>
             ))}
@@ -110,7 +110,7 @@ const Page = () => {
       {userRole && (
         <AddButton
           onClick={openModal}
-          className="fixed bottom-4 right-4 z-10"
+          className="fixed bottom-6 right-6 z-10 bg-yellow-500 text-white p-4 rounded-full shadow-lg hover:bg-yellow-600 transition-all duration-300 transform hover:scale-110"
         />
       )}
 
