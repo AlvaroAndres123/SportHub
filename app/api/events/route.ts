@@ -1,12 +1,21 @@
-/*
-import { query } from '../../lib/db';
+import { sql } from "@vercel/postgres";
+import { NextRequest, NextResponse } from "next/server";
 
-export default async function handler(req, res) {
-  if (req.method === 'GET') {
-    const result = await query('SELECT * FROM events');
-    res.status(200).json(result.rows);
-  } else {
-    res.status(405).json({ error: 'Método no permitido' });
+export async function GET(req: NextRequest) {
+  try {
+    const result = await sql`SELECT * FROM events`;
+
+    return NextResponse.json(result.rows);
+  } catch (error) {
+    console.error("Error al obtener eventos:", error);
+    return NextResponse.json(
+      { error: "Error al obtener los eventos" },
+      { status: 500 }
+    );
   }
 }
-*/
+
+export async function POST(req: NextRequest) {
+
+  return NextResponse.json({ message: 'Método POST no implementado' }, { status: 405 });
+}

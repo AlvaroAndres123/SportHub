@@ -1,22 +1,30 @@
-/*
-import { query } from '../../../lib/db';
+import { sql } from "@vercel/postgres";
+import { NextRequest, NextResponse } from "next/server";
 
-export default async function handler(req, res) {
-  const { sport_id } = req.query;
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const sport_id = searchParams.get("sport_id");
 
-  if (req.method === 'GET') {
-    const result = await query(`
+  if (!sport_id) {
+    return NextResponse.json({ error: "sport_id es requerido" }, { status: 400 });
+  }
+
+  try {
+    const result = await sql`
       SELECT u.name, r.points, r.rank_position 
       FROM rankings r
       JOIN users u ON u.idusers = r.idusers
-      WHERE r.idsports = $1
+      WHERE r.idsports = ${sport_id}
       ORDER BY r.rank_position ASC
-    `, [sport_id]);
-
-    res.status(200).json(result.rows);
-  } else {
-    res.status(405).json({ error: 'Método no permitido' });
+    `;
+    
+    // Devolver los resultados de la consulta
+    return NextResponse.json(result.rows);
+  } catch (error) {
+    console.error("Error al obtener el ranking:", error);
+    return NextResponse.json(
+      { error: "Error al obtener el ranking" },
+      { status: 500 }
+    );
   }
 }
-
-*/ 
