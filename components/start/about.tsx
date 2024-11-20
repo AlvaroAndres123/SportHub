@@ -14,28 +14,29 @@ const About = () => {
       id: 1,
       name: "Alvaro Casco",
       image: "/img/Moura.jpg", 
-      quote: "Siempre hay una solución para todo, solo hay que saber buscarla.",
+      quote: "Estaremos bien al final y si no estamos bien no hemos llegado al final",
     },
     {
       id: 2,
       name: "Carlos Muñoz",
       image: "/img/Charlie.jpeg",
-      quote: "La tecnología debe ser al servicio de las personas, no al revés.",
+      quote: "Bah, típica frase Rivense, donde cada 'bah' significa que los cosas van mal.",
     },
     {
       id: 3,
       name: "Manuel Paniagua",
       image: "/img/Paniagua.jpeg",
-      quote: "Automatizar procesos es la clave para un desarrollo eficiente.",
+      quote: " Se ven en la pantalla tres vectores linealmente independientes. ¿Como se llama la película?. Rango 3. ",
     }
   ];
 
   return (
-    <div className="bg-gray-50 min-h-screen py-12 px-6">
- 
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-semibold text-primary mb-4">Conoce a los Desarrolladores</h1>
-        <p className="text-lg text-gray-700 max-w-3xl mx-auto mb-6">
+    <div className=" min-h-screen py-16 px-8">
+      <div className="text-center mb-16">
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-primary mb-6 animate__animated animate__fadeIn animate__delay-1s">
+          Conoce a los Desarrolladores
+        </h1>
+        <p className="text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto mb-10 opacity-90 animate__animated animate__fadeIn animate__delay-2s">
           Somos jóvenes estudiantes de Ingeniería en Sistemas con ganas de superarnos, y eso incluye desarrollar 
           diversos proyectos innovadores. Nos apasiona la tecnología y estamos comprometidos con el aprendizaje continuo 
           para enfrentar los desafíos del futuro. Creemos en el trabajo en equipo y 
@@ -43,15 +44,16 @@ const About = () => {
         </p>
       </div>
 
-
-      <div className="flex flex-wrap justify-center gap-8">
+      {/* Sección de los desarrolladores */}
+      <div className="flex flex-wrap justify-center gap-10">
         {developers.map((developer) => (
-          <DeveloperCard 
-            key={developer.id}
-            name={developer.name}
-            image={developer.image}
-            quote={developer.quote}  
-          />
+          <div key={developer.id} className="bg-white rounded-lg shadow-lg transform hover:scale-105 hover:shadow-2xl transition-all duration-300">
+            <DeveloperCard 
+              name={developer.name}
+              image={developer.image}
+              quote={developer.quote}  
+            />
+          </div>
         ))}
       </div>
     </div>
