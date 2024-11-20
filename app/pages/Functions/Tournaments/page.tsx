@@ -50,7 +50,7 @@ const Page = () => {
 
     if (!session) {
       setUserRole(null);
-      setLoading(false); 
+      setLoading(false);
     } else {
       fetchUserRole();
     }
@@ -74,12 +74,11 @@ const Page = () => {
   }
 
   if (!session) {
-    // Si no hay sesión, mostrar mensaje y botón para volver al inicio
     return (
       <div className="min-h-screen flex flex-col justify-center items-center text-center">
         <p className="text-gray-600 text-lg mb-4">No has iniciado sesión.</p>
         <Link className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded" href="/">
-            Volver al inicio
+          Volver al inicio
         </Link>
       </div>
     );
@@ -108,7 +107,7 @@ const Page = () => {
       </div>
 
       {/* Botón de agregar evento */}
-      {userRole === 'Organizador' && (
+      {userRole && (
         <AddButton
           onClick={openModal}
           className="fixed bottom-4 right-4 z-10"
