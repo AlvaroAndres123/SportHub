@@ -1,77 +1,61 @@
 import React from 'react'
-import Image from 'next/image'
+import DeveloperCard from '../DeveloperCard'
 
-const about = () => {
-    return (
-        <div className='container mx-auto px-4 md:px-8'>
-            <h1 className='title py-6 md:text-left text-center'>Sobre los Desarolladores</h1>
-
-            <div className='flex flex-col md:flex-row gap-y-4 md:gap-x-4'>
-
-
-                {/*Descritive Text*/}
-                <div className='border-gray-300 p-4 shadow-lg basis-full md:basis-1/2'>
-                    <p className='ptext'>
-                    Somos jóvenes estudiantes de Ingeniería en Sistemas con ganas de superarnos, y eso incluye desarrollar 
-                    diversos proyectos innovadores. Nos apasiona la tecnología y estamos comprometidos con el aprendizaje continuo 
-                    para enfrentar los desafíos del futuro. Creemos en el trabajo en equipo y 
-                    en la colaboración para alcanzar nuestras metas y contribuir positivamente a la sociedad.
-                    </p>
-
-                </div>
-
-                <div className=''>
-                    <h2 className='subtitle text-center md:text-left '>Nuestros Desarolladores</h2>
-
-
-                    {/*Images*/}
-                    <div className='flex flex-col sm:flex-row justify-center items-center md:justify-start md:flex-row gap-4'>
-
-                        <div className='flex flex-col items-center'>
-                            <Image className='rounded-full'
-                                src={'/img/Moura.jpg'}
-                                width={200}
-                                height={200}
-                                alt='Picture of developers'
-                            />
-                            <h1>Alvaro Casco</h1>
-                        </div>
-                        
-                        <div className='flex flex-col items-center'>
-                            <Image className='rounded-full'
-                                src={'/img/Moura.jpg'}
-                                width={200}
-                                height={200}
-                                alt='Picture of developers'
-                            />
-                                   <h1>Manuel Paniagua </h1>
-                        </div>
-                 
-
-
-                        <div className='flex flex-col items-center'>
-                            <Image className='rounded-full'
-                                src={'/img/Moura.jpg'}
-                                width={200}
-                                height={200}
-                                alt='Picture of developers'
-                            />
-                                <h1>Carlos Muñoz</h1>
-                        </div>
-
-                    
-
-                    </div>
-
-
-
-                </div >
-
-
-            </div >
-
-        </div >
-    )
+interface Developer {
+  id: number;
+  name: string;
+  image: string;
+  quote: string;
 }
 
-export default about
+const About = () => {
+  const developers: Developer[] = [
+    {
+      id: 1,
+      name: "Alvaro Casco",
+      image: "/img/Moura.jpg", 
+      quote: "Siempre hay una solución para todo, solo hay que saber buscarla.",
+    },
+    {
+      id: 2,
+      name: "Carlos Muñoz",
+      image: "/img/Charlie.jpeg",
+      quote: "La tecnología debe ser al servicio de las personas, no al revés.",
+    },
+    {
+      id: 3,
+      name: "Manuel Paniagua",
+      image: "/img/Paniagua.jpeg",
+      quote: "Automatizar procesos es la clave para un desarrollo eficiente.",
+    }
+  ];
+
+  return (
+    <div className="bg-gray-50 min-h-screen py-12 px-6">
+ 
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-semibold text-primary mb-4">Conoce a los Desarrolladores</h1>
+        <p className="text-lg text-gray-700 max-w-3xl mx-auto mb-6">
+          Somos jóvenes estudiantes de Ingeniería en Sistemas con ganas de superarnos, y eso incluye desarrollar 
+          diversos proyectos innovadores. Nos apasiona la tecnología y estamos comprometidos con el aprendizaje continuo 
+          para enfrentar los desafíos del futuro. Creemos en el trabajo en equipo y 
+          en la colaboración para alcanzar nuestras metas y contribuir positivamente a la sociedad.
+        </p>
+      </div>
+
+
+      <div className="flex flex-wrap justify-center gap-8">
+        {developers.map((developer) => (
+          <DeveloperCard 
+            key={developer.id}
+            name={developer.name}
+            image={developer.image}
+            quote={developer.quote}  
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default About;
