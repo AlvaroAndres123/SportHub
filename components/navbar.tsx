@@ -5,7 +5,6 @@ import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -31,6 +30,9 @@ const Navbar: React.FC = () => {
           </Link>
           <Link className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Tournaments">
             <i className="fas fa-cogs mr-2" /> Torneos
+          </Link>
+          <Link className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Teams">
+            <i className="fas fa-users mr-2" /> Equipo
           </Link>
         </div>
         <div className="hidden md:flex gap-6 items-center relative">
@@ -85,6 +87,9 @@ const Navbar: React.FC = () => {
           </Link>
           <Link onClick={toggleMenu} className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Tournaments">
             <i className="fas fa-cogs mr-2" /> Torneos
+          </Link>
+          <Link onClick={toggleMenu} className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Teams">
+            <i className="fas fa-users mr-2" /> Equipo
           </Link>
           {session ? (
             <>
