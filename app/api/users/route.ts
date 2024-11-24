@@ -1,42 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@vercel/postgres';
-import { signIn } from 'next-auth/react';  // Esto no funcionará en el backend, solo se puede usar en el cliente. por que lo puse aqui no me acuerdo deberia borarlo
 
 export async function GET(req: NextRequest) {
   let client;
   try {
     client = await db.connect();
     const result = await client.query('SELECT * FROM users');
-    client.release();
-    return NextResponse.json(result.rows);
+    return NextResponse.json({ success: true, data: result.rows });
   } catch (error) {
-    console.error('Error en Buscar users:', error);
-    return NextResponse.json({ error: 'Error en Buscar users' }, { status: 500 });
+    console.error('Error al obtener usuarios:', error);
+    return NextResponse.json(
+      { success: false, error: 'Error al obtener usuarios' },
+      { status: 500 }
+    );
+  } finally {
+    client?.release(); 
   }
 }
 
 export async function PATCH(req: NextRequest) {
-  const { id, name } = await req.json(); 
-  let client;
-  
-  if (!id || !name) {
-    return NextResponse.json({ error: 'Falta Campos' }, { status: 400 });
-  }
-
   try {
-    client = await db.connect();
+    const body = await req.json();
+    console.log('Datos recibidos en el backend:', body);
 
-    await client.query(
-      'UPDATE users SET name = $1 WHERE idusers = $2',
+    const { id, name } = body;
+    if (!id || !name) {
+      console.log('Error: Faltan campos', body);
+      return NextResponse.json(
+        { error: 'Falta Campos' },
+        { status: 400 }
+      );
+    }
+
+    const client = await db.connect();
+    const result = await client.query(
+      'UPDATE users SET name = $1 WHERE idusers = $2 RETURNING *',
       [name, id]
     );
 
-    client.release();
+    console.log('Resultado de la consulta:', result.rows);
 
+    if (result.rowCount === 0) {
+      return NextResponse.json(
+        { error: 'Usuario no encontrado' },
+        { status: 404 }
+      );
+    }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, data: result.rows[0] });
   } catch (error) {
-    console.error('Error Actualizar user:', error);
-    return NextResponse.json({ error: 'Error Actualizar user' }, { status: 500 });
+    console.error('Error al procesar la solicitud PATCH:', error);
+    return NextResponse.json(
+      { error: 'Error al procesar la solicitud' },
+      { status: 500 }
+    );
   }
 }
+

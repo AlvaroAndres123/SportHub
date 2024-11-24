@@ -22,18 +22,22 @@ const Navbar: React.FC = () => {
           </Link>
         </div>
         <div className="hidden md:flex gap-6 text-lg">
-          <Link className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Calendar">
-            <i className="fas fa-calendar-alt mr-2" /> Calendario
-          </Link>
-          <Link className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Ranking">
-            <i className="fas fa-trophy mr-2" /> Rankings
-          </Link>
-          <Link className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Tournaments">
-            <i className="fas fa-cogs mr-2" /> Torneos
-          </Link>
-          <Link className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Teams">
-            <i className="fas fa-users mr-2" /> Equipo
-          </Link>
+          {session && (
+            <>
+              <Link className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Calendar">
+                <i className="fas fa-calendar-alt mr-2" /> Calendario
+              </Link>
+              <Link className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Ranking">
+                <i className="fas fa-trophy mr-2" /> Rankings
+              </Link>
+              <Link className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Tournaments">
+                <i className="fas fa-cogs mr-2" /> Torneos
+              </Link>
+              <Link className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Teams">
+                <i className="fas fa-users mr-2" /> Equipo
+              </Link>
+            </>
+          )}
         </div>
         <div className="hidden md:flex gap-6 items-center relative">
           {session ? (
@@ -41,7 +45,7 @@ const Navbar: React.FC = () => {
               <span className="text-sm font-semibold">Bienvenido, {session.user?.name}</span>
               <button onClick={toggleDropdown} className="relative">
                 <img
-                  src={session.user?.image || "/img/default-avatar.jpg"}
+                  src={"/img/default-avatar.jpg"}
                   alt="Avatar"
                   className="w-10 h-10 rounded-full object-cover cursor-pointer transform hover:scale-110 transition-transform duration-200"
                 />
@@ -79,44 +83,23 @@ const Navbar: React.FC = () => {
       {/* Menú móvil */}
       {isOpen && (
         <div className="md:hidden absolute top-full inset-x-0 bg-gray-800 w-full text-white flex flex-col items-center space-y-4 py-4 shadow-xl">
-          <Link onClick={toggleMenu} className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Calendar">
-            <i className="fas fa-calendar-alt mr-2" /> Calendario
-          </Link>
-          <Link onClick={toggleMenu} className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Ranking">
-            <i className="fas fa-trophy mr-2" /> Rankings
-          </Link>
-          <Link onClick={toggleMenu} className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Tournaments">
-            <i className="fas fa-cogs mr-2" /> Torneos
-          </Link>
-          <Link onClick={toggleMenu} className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Teams">
-            <i className="fas fa-users mr-2" /> Equipo
-          </Link>
-          {session ? (
+          {session && (
             <>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold">Bienvenido, {session.user?.name}</span>
-                <img
-                  src={session.user?.image || "/default-avatar.png"}
-                  alt="Avatar"
-                  className="w-10 h-10 rounded-full object-cover cursor-pointer transform hover:scale-110 transition-transform duration-200"
-                  onClick={toggleDropdown}
-                />
-              </div>
-              {dropdownOpen && (
-                <div className="flex flex-col space-y-2 mt-4">
-                  <Link onClick={toggleMenu} href="/configuracion" className="hover:text-yellow-400 transition-all duration-300">
-                    <i className="fas fa-cogs mr-2" /> Configuración
-                  </Link>
-                  <button
-                    onClick={() => { signOut(); toggleMenu(); }}
-                    className="text-left w-full hover:text-yellow-400 transition-all duration-300"
-                  >
-                    <i className="fas fa-sign-out-alt mr-2" /> Cerrar Sesión
-                  </button>
-                </div>
-              )}
+              <Link onClick={toggleMenu} className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Calendar">
+                <i className="fas fa-calendar-alt mr-2" /> Calendario
+              </Link>
+              <Link onClick={toggleMenu} className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Ranking">
+                <i className="fas fa-trophy mr-2" /> Rankings
+              </Link>
+              <Link onClick={toggleMenu} className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Tournaments">
+                <i className="fas fa-cogs mr-2" /> Torneos
+              </Link>
+              <Link onClick={toggleMenu} className="flex items-center hover:text-yellow-400 transition-all duration-300" href="/pages/Functions/Teams">
+                <i className="fas fa-users mr-2" /> Equipo
+              </Link>
             </>
-          ) : (
+          )}
+          {!session && (
             <>
               <Link onClick={toggleMenu} className="bg-yellow-500 text-white py-2 px-6 rounded-full hover:bg-yellow-600 transition-all duration-300" href="/pages/login">
                 Iniciar Sesión

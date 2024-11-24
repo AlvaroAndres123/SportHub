@@ -1,20 +1,25 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react'; 
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import ProfileForm from '@/components/auth/ProfileForm';
 import BackButton from '@/components/auth/backbutton';
+import Loading from '@/components/loading';
+
+
 
 const Configuracion = () => {
-  const { data: session, status } = useSession(); 
+  const { data: session, status, update } = useSession(); // Incluye `update` para actualizar la sesión
   const router = useRouter();
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [user, setUser] = useState<any>(null); 
+  const [user, setUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (session) {
-      setUser(session.user); 
+      setUser(session.user);
     }
   }, [session]);
 
@@ -23,46 +28,58 @@ const Configuracion = () => {
   };
 
   const handleFormSubmit = async (formData: FormData) => {
-    const name = formData.get('name');  // Asegúrate de que el nombre se obtiene correctamente
+    const name = formData.get('name');
     if (!name || !user?.id) {
       alert('Por favor, ingresa un nombre válido');
       return;
     }
-  
+
     const data = {
-      id: user?.id, 
+      id: user?.id,
       name: name,
     };
 
-    const response = await fetch('/api/users', {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
+    console.log('Datos enviados al backend:', data); 
+
+    try {
+      const response = await fetch('/api/users', {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const updatedUser = await response.json();
+        setUser(updatedUser.data);
+        await update();
+      } else {
+        const error = await response.json();
+        console.error('Error en la respuesta del backend:', error);
       }
-    });
-  
-    if (response.ok) {
-      alert('Perfil actualizado con éxito');
-      const updatedUser = await response.json();
-      setUser(updatedUser);
-    } else {
-      alert('Error al actualizar el perfil');
+    } catch (error) {
+      console.error('Error al realizar la solicitud:', error);
     }
   };
 
-  if (!session || !user) {
-    return <div>Loading...</div>;
+
+  if (status === 'loading' || !session || !user) {
+    return (
+     <Loading/>
+    );
   }
+  
+  
 
   return (
     <div className="bgimage min-h-screen py-8 px-4 sm:px-6 lg:px-8 relative">
       {/* Botón de Volver */}
-      <BackButton 
+      <BackButton
         onClick={handleBackClick}
         className="text-white font-extrabold absolute top-4 left-4 z-10"
       />
-      
+
       {/* Título de la página */}
       <h1 className="text-3xl font-semibold text-center text-white mb-8 z-10">Configuración de Usuario</h1>
 
@@ -75,8 +92,8 @@ const Configuracion = () => {
           <p className="text-gray-600 mb-2">Correo Electrónico: <span className="font-semibold">{user?.email}</span></p>
 
           {/* Botón para editar perfil */}
-          <button 
-            onClick={() => setIsEditingProfile(!isEditingProfile)} 
+          <button
+            onClick={() => setIsEditingProfile(!isEditingProfile)}
             className="bg-yellow-400 text-white py-2 px-4 rounded-full hover:bg-yellow-500 transition-all duration-300"
           >
             {isEditingProfile ? 'Cancelar' : 'Editar Perfil'}
@@ -85,12 +102,15 @@ const Configuracion = () => {
 
         {isEditingProfile && (
           <div className="mt-6">
-            <ProfileForm 
-              onSubmit={handleFormSubmit} 
-              initialValues={{ name: user?.name}} 
+            <ProfileForm
+              onSubmit={handleFormSubmit}
+              initialValues={{ name: user?.name }}
+              isLoading={isLoading}
             />
           </div>
         )}
+
+        {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
     </div>
   );

@@ -1,56 +1,25 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useSession, signIn } from 'next-auth/react';
 
 interface ProfileFormProps {
   onSubmit: (formData: FormData) => Promise<void>;
   initialValues: {
     name: string;
   };
+  isLoading: boolean; 
 }
 
-const ProfileForm: React.FC<ProfileFormProps> = ({ initialValues }) => {
-  const { data: session } = useSession();
+const ProfileForm: React.FC<ProfileFormProps> = ({ initialValues, onSubmit, isLoading }) => {
   const [name, setName] = useState(initialValues.name || '');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!session || !session.user) {
-      alert('Sesión no encontrada.');
-      return;
-    }
+    const formData = new FormData();
+    formData.set('name', name);
 
-    if (!name || !session.user.id) {
-      alert('Por favor, ingresa un nombre válido');
-      return;
-    }
-
-    const data = {
-      id: session.user.id,
-      name: name,
-    };
-
-    try {
-      const response = await fetch('/api/users', {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-
-        alert('Perfil actualizado con éxito');
-      } else {
-        alert('Error al actualizar el perfil');
-      }
-    } catch (error) {
-      console.error('Error al realizar la solicitud:', error);
-      alert('Hubo un error al actualizar el perfil');
-    }
+    await onSubmit(formData);
   };
 
   return (
@@ -69,9 +38,12 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ initialValues }) => {
 
       <button
         type="submit"
-        className="w-full py-3 bg-primary text-white font-semibold rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition"
+        disabled={isLoading}
+        className={`w-full py-3 ${
+          isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-primary hover:bg-yellow-600'
+        } text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition`}
       >
-        Actualizar Perfil
+        {isLoading ? 'Actualizando...' : 'Actualizar Perfil'}
       </button>
     </form>
   );
