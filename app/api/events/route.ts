@@ -1,21 +1,44 @@
 import { sql } from "@vercel/postgres";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const result = await sql`SELECT * FROM events`;
+    const events = await sql`
+      SELECT 
+        events.idevents AS id,
+        events.name,
+        events.date,
+        events.description,
+        events.start_time AS startTime,
+        events.end_time AS endTime,
+        sports.name AS sportName -- Aquí obtenemos el nombre del deporte
+      FROM events
+      LEFT JOIN sports ON events.idsports = sports.idsports
+    `;
 
-    return NextResponse.json(result.rows);
+    return NextResponse.json(events.rows);
   } catch (error) {
     console.error("Error al obtener eventos:", error);
-    return NextResponse.json(
-      { error: "Error al obtener los eventos" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
+export async function POST(req: Request) {
+  try {
+    const { name, date, description, sport, startTime, endTime, idusers } = await req.json();
 
-export async function POST(req: NextRequest) {
+    if (!name || !date || !sport || !startTime || !endTime || !idusers) {
+      return NextResponse.json({ error: "Faltan campos obligatorios" }, { status: 400 });
+    }
 
-  return NextResponse.json({ message: 'Método POST no implementado' }, { status: 405 });
+    const result = await sql`
+      INSERT INTO events (name, date, description, idsports, start_time, end_time, idusers)
+      VALUES (${name}, ${date}, ${description}, ${sport}, ${startTime}, ${endTime}, ${idusers})
+      RETURNING idevents AS id, name, date, description, start_time AS startTime, end_time AS endTime, idsports AS sport
+    `;
+
+    return NextResponse.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error al crear evento:", error);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+  }
 }

@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import ProfileForm from '@/components/auth/ProfileForm';
 import BackButton from '@/components/auth/backbutton';
-import Loading from '@/components/loading';
+import Loading from '@/app/loading';
 
 
 
