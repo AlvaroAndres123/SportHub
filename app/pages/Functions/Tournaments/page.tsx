@@ -4,12 +4,11 @@ import React, { useState, useEffect } from 'react';
 import Navbar from "@/components/navbar";
 import AddButton from '@/components/add';
 import ModalEventOrg from '@/components/functions/ModalEventOrg';
-import ModalEventPlayer from '@/components/functions/ModalEventPl';
 import ModalViewEvent from '@/components/functions/ModalViewEvents';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation'; // Importar el hook de navegación
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Loading from '@/app/loading';
+import Link from 'next/link';
 
 interface Event {
   id: number;
@@ -22,21 +21,25 @@ interface Event {
   shareCode?: string;
 }
 
+// Variables globales para cachear datos
+let cachedEvents: Event[] | null = null;
+let cachedUserRole: string | null = null;
+
 const formatDate = (dateString: string) => {
   const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
   return new Intl.DateTimeFormat('en-CA', options).format(new Date(dateString));
 };
 
-const formatTime = (startTime: string | null, endTime: string | null) => {
-  if (!startTime || !endTime) return '-';
-  const [startHour, startMinute] = startTime.split(':');
-  const [endHour, endMinute] = endTime.split(':');
-  return `${startHour}:${startMinute} a ${endHour}:${endMinute}`;
+const formatTime = (time: string | undefined | null): string => {
+  if (!time || !time.includes(':')) return '-'; 
+  const [hour = '00', minute = '00'] = time.split(':'); 
+  return `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`;
 };
+
 
 const Page = () => {
   const { data: session, status } = useSession();
-  const router = useRouter(); // Inicializar el router
+  const router = useRouter();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isViewModalOpen, setViewModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -47,36 +50,42 @@ const Page = () => {
   // Redirigir al usuario si no está autenticado
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/'); // Redirigir a la página de inicio
+      router.push('/');
     }
   }, [status, router]);
 
-  // Fetch events
   useEffect(() => {
     const fetchEvents = async () => {
       if (!session?.user?.id) {
         setLoading(false);
         return;
       }
-    
+
+      // Si hay datos cacheados, utilizarlos
+      if (cachedEvents) {
+        setEvents(cachedEvents);
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         const response = await fetch(`/api/events?userId=${session.user.id}`);
         if (response.ok) {
           const data = await response.json();
-          console.log(data); // Verificar que `sharecode` existe en los datos
           const mappedEvents = data.map((event: any) => ({
             id: event.id,
             name: event.name,
             date: event.date,
             description: event.description,
-            startTime: event.starttime,
-            endTime: event.endtime,
-            sportName: event.sportname,
-            shareCode: event.sharecode, // Verifica que este mapeo coincida con el backend
+            startTime: event.starttime || '-', // Validar hora
+            endTime: event.endtime || '-',
+            sportName: event.sportname || 'Sin asignar',
+            shareCode: event.sharecode || '', // Validar código
           }));
-    
+
           setEvents(mappedEvents);
+          cachedEvents = mappedEvents; // Cachear los eventos
         } else {
           console.error("Error al obtener eventos:", response.statusText);
         }
@@ -86,17 +95,11 @@ const Page = () => {
         setLoading(false);
       }
     };
-    
-    if (status === 'authenticated') {
-      fetchEvents();
-    }
-  }, [session, status]);
 
-  // Fetch user role once
-  useEffect(() => {
     const fetchUserRole = async () => {
-      if (!session?.user?.id || userRole) {
-        return; // Evitar llamadas adicionales si ya tenemos el rol
+      if (!session?.user?.id || cachedUserRole) {
+        setUserRole(cachedUserRole); // Si ya está cacheado, usarlo
+        return;
       }
 
       try {
@@ -104,6 +107,7 @@ const Page = () => {
         if (response.ok) {
           const data = await response.json();
           setUserRole(data.role || null);
+          cachedUserRole = data.role || null; // Cachear el rol del usuario
         } else {
           console.error("Error al obtener el rol del usuario:", response.statusText);
         }
@@ -112,8 +116,11 @@ const Page = () => {
       }
     };
 
-    fetchUserRole();
-  }, [session, userRole]);
+    if (status === 'authenticated') {
+      fetchEvents();
+      fetchUserRole();
+    }
+  }, [session, status]);
 
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
@@ -129,10 +136,25 @@ const Page = () => {
   };
 
   const addEvent = (newEvent: Event) => {
-    setEvents([...events, newEvent]);
+    const formattedEvent = {
+      ...newEvent,
+      startTime: formatTime(newEvent.startTime), 
+      endTime: formatTime(newEvent.endTime),
+      sportName: newEvent.sportName || 'Sin asignar',
+      shareCode: newEvent.shareCode || '', 
+    };
+  
+    const updatedEvents = [...events, formattedEvent];
+    setEvents(updatedEvents);
+    cachedEvents = updatedEvents; 
     closeModal();
+  
+ 
+    setTimeout(() => {
+      window.location.reload();
+    }, 500); 
   };
-
+  
   const deleteEvent = async (eventId: number) => {
     try {
       const response = await fetch(`/api/events/${eventId}`, {
@@ -143,7 +165,9 @@ const Page = () => {
         throw new Error('Error al eliminar el evento');
       }
 
-      setEvents(events.filter(event => event.id !== eventId));
+      const updatedEvents = events.filter(event => event.id !== eventId);
+      setEvents(updatedEvents);
+      cachedEvents = updatedEvents; // Actualizar el cache
       alert('Evento eliminado con éxito.');
     } catch (error) {
       console.error(error);
@@ -152,7 +176,11 @@ const Page = () => {
   };
 
   const updateEvent = (updatedEvent: Event) => {
-    setEvents(events.map(event => (event.id === updatedEvent.id ? updatedEvent : event)));
+    const updatedEvents = events.map(event =>
+      event.id === updatedEvent.id ? updatedEvent : event
+    );
+    setEvents(updatedEvents);
+    cachedEvents = updatedEvents; // Actualizar el cache
   };
 
   if (status === 'loading' || isLoading) {
@@ -186,13 +214,13 @@ const Page = () => {
                   {event.name}
                 </h3>
                 <p className="text-gray-700"><strong>Fecha:</strong> {formatDate(event.date)}</p>
-                <p className="text-gray-700"><strong>Hora:</strong> {formatTime(event.startTime, event.endTime)}</p>
-                <p className="text-gray-700"><strong>Deporte:</strong> {event.sportName || 'Sin asignar'}</p>
+                <p className="text-gray-700"><strong>Hora:</strong> {formatTime(event.startTime)} a {formatTime(event.endTime)}</p>
+                <p className="text-gray-700"><strong>Deporte:</strong> {event.sportName}</p>
                 <p className="text-gray-600 mt-2">{event.description}</p>
                 {userRole === 'Organizador' && (
                   <button
                     onClick={() => openViewModal(event)}
-                    className="mt-4 py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300"
+                    className="mt-4 py-2 px-4 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 transition duration-300"
                   >
                     Ver
                   </button>
