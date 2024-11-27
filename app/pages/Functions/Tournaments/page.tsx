@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from "@/components/navbar";
 import AddButton from '@/components/add';
+import ModalEventPlayer from '@/components/functions/ModalEventPl';
 import ModalEventOrg from '@/components/functions/ModalEventOrg';
 import ModalViewEvent from '@/components/functions/ModalViewEvents';
 import { useSession } from 'next-auth/react';
@@ -36,11 +37,11 @@ const formatTime = (time: string | undefined | null): string => {
   return `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`;
 };
 
-
 const Page = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isPlayerModalOpen, setPlayerModalOpen] = useState(false); // Modal para jugador
   const [isViewModalOpen, setViewModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
@@ -122,8 +123,56 @@ const Page = () => {
     }
   }, [session, status]);
 
-  const openModal = () => setModalOpen(true);
-  const closeModal = () => setModalOpen(false);
+  
+  const registerForEvent = async (registrationCode: string) => {
+    try {
+      const response = await fetch("/api/events/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ registrationCode }),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Error al registrar participación.");
+      }
+  
+      const data = await response.json();
+  
+      // Buscar el evento registrado y actualizar el estado
+      const registeredEvent = events.find(
+        (event) => event.shareCode === registrationCode
+      );
+  
+      if (registeredEvent) {
+        alert("¡Registro exitoso en el evento!");
+      } else {
+        alert("Registro exitoso, pero el evento no se encuentra en la lista.");
+      }
+    } catch (error) {
+      console.error("Error al registrar el evento:", error);
+      alert("Hubo un error al registrar tu participación. Intenta nuevamente.");
+    }
+  };
+  
+  
+
+  const openModal = () => {
+    if (userRole === 'Organizador') {
+      setModalOpen(true);
+    } else if (userRole === 'Jugador') {
+      setPlayerModalOpen(true); 
+    }
+  };
+
+  const closeModal = () => {
+    if (userRole === 'Organizador') {
+      setModalOpen(false);
+    } else if (userRole === 'Jugador') {
+      setPlayerModalOpen(false); 
+    }
+  };
 
   const openViewModal = (event: Event) => {
     setSelectedEvent(event);
@@ -148,13 +197,8 @@ const Page = () => {
     setEvents(updatedEvents);
     cachedEvents = updatedEvents; 
     closeModal();
-  
- 
-    setTimeout(() => {
-      window.location.reload();
-    }, 500); 
   };
-  
+
   const deleteEvent = async (eventId: number) => {
     try {
       const response = await fetch(`/api/events/${eventId}`, {
@@ -217,28 +261,25 @@ const Page = () => {
                 <p className="text-gray-700"><strong>Hora:</strong> {formatTime(event.startTime)} a {formatTime(event.endTime)}</p>
                 <p className="text-gray-700"><strong>Deporte:</strong> {event.sportName}</p>
                 <p className="text-gray-600 mt-2">{event.description}</p>
-                {userRole === 'Organizador' && (
-                  <button
-                    onClick={() => openViewModal(event)}
-                    className="mt-4 py-2 px-4 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 transition duration-300"
-                  >
-                    Ver
-                  </button>
-                )}
+                <button
+                  onClick={() => openViewModal(event)}
+                  className="mt-4 py-2 px-4 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 transition duration-300"
+                >
+                  Ver
+                </button>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {userRole === 'Organizador' && (
-        <AddButton
-          onClick={openModal}
-          className="fixed bottom-6 right-6 z-10 bg-yellow-500 text-white p-4 rounded-full shadow-lg hover:bg-yellow-600 transition duration-300 transform hover:scale-110"
-        />
-      )}
+      <AddButton
+        onClick={openModal}
+        className="fixed bottom-6 right-6 z-10 bg-yellow-500 text-white p-4 rounded-full shadow-lg hover:bg-yellow-600 transition duration-300 transform hover:scale-110"
+      />
 
       <ModalEventOrg isOpen={isModalOpen} onClose={closeModal} addEvent={addEvent} />
+      <ModalEventPlayer isOpen={isPlayerModalOpen} onClose={closeModal} registerForEvent={registerForEvent}/>
       <ModalViewEvent
         isOpen={isViewModalOpen}
         event={selectedEvent}

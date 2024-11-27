@@ -2,6 +2,13 @@
 
 import React, { useState } from 'react';
 
+interface JoinRequest {
+  id: number;
+  userName: string;
+  userEmail: string;
+  status: string; // 'Pending', 'Accepted', 'Rejected'
+}
+
 interface Event {
   id: number;
   name: string;
@@ -10,7 +17,8 @@ interface Event {
   startTime: string;
   endTime: string;
   sportName: string;
-  shareCode?: string; // Hacer opcional
+  shareCode?: string;
+  joinRequests?: JoinRequest[]; // Agregar solicitudes de unión
 }
 
 interface ModalViewEventProps {
@@ -133,6 +141,38 @@ const ModalViewEvent: React.FC<ModalViewEventProps> = ({
               </p>
             )}
             <p className="text-gray-600 mt-2">{event.description}</p>
+
+            {/* Mostrar solicitudes de unión */}
+            {event.joinRequests && event.joinRequests.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold text-yellow-600 mt-4">Solicitudes de Unión:</h3>
+                <ul className="mt-2 space-y-2">
+                  {event.joinRequests.map((request) => (
+                    <li
+                      key={request.id}
+                      className="p-3 bg-gray-100 rounded-lg flex justify-between items-center"
+                    >
+                      <div>
+                        <p className="text-gray-800 font-semibold">{request.userName}</p>
+                        <p className="text-gray-600 text-sm">{request.userEmail}</p>
+                      </div>
+                      <span
+                        className={`text-xs font-semibold py-1 px-3 rounded-lg ${
+                          request.status === 'Pending'
+                            ? 'bg-yellow-300 text-yellow-800'
+                            : request.status === 'Accepted'
+                            ? 'bg-green-300 text-green-800'
+                            : 'bg-red-300 text-red-800'
+                        }`}
+                      >
+                        {request.status}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             <button
               onClick={handleEditToggle}
               className="w-full py-2 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 transition duration-300"
