@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import EventCard from './EventCard';
+import ModalViewEvent from '@/components/functions/ModalViewEvents';
 import { Event } from '@/types/types';
 import Loading from '@/app/loading';
 import { useSession } from 'next-auth/react';
@@ -11,37 +12,78 @@ const OrganizerEvents: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    const fetchOrganizerEvents = async () => {
-      const userId = session?.user?.id; // Obtener userId dinámicamente
-      if (!userId) return;
+  // Estado para manejar el modal
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
-      try {
-        const response = await fetch(`/api/events?userId=${userId}`);
-        if (response.ok) {
-          const data = await response.json();
-          const mappedEvents = data.map((event: any) => ({
-            id: event.id,
-            name: event.name,
-            date: event.date,
-            description: event.description,
-            startTime: event.starttime,
-            endTime: event.endtime,
-            sportName: event.sportname,
-          }));
-          setEvents(mappedEvents);
-        } else {
-          console.error('Error al obtener eventos del organizador:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error al llamar al API:', error);
-      } finally {
-        setIsLoading(false);
+  const fetchOrganizerEvents = async () => {
+    const userId = session?.user?.id; 
+    if (!userId) return;
+
+    try {
+      const response = await fetch(`/api/events?userId=${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        const mappedEvents = data.map((event: any) => ({
+          id: event.id,
+          name: event.name,
+          date: event.date,
+          description: event.description,
+          startTime: event.starttime,
+          endTime: event.endtime,
+          sportName: event.sportname,
+          shareCode: event.sharecode, // Asegúrate de que este campo venga del API
+        }));
+        setEvents(mappedEvents);
+      } else {
+        console.error('Error al obtener eventos del organizador:', response.statusText);
       }
-    };
+    } catch (error) {
+      console.error('Error al llamar al API:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchOrganizerEvents();
   }, [session]);
+
+  const handleViewDetails = (event: Event) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedEvent(null);
+  };
+
+  const handleDeleteEvent = async (eventId: number) => {
+    try {
+      const response = await fetch(`/api/events/${eventId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setEvents((prevEvents) => prevEvents.filter((event) => event.id !== eventId));
+        handleCloseModal();
+        alert('Evento eliminado con éxito.');
+      } else {
+        alert('Error al eliminar el evento.');
+      }
+    } catch (error) {
+      console.error('Error al eliminar el evento:', error);
+      alert('Error al eliminar el evento.');
+    }
+  };
+
+  const handleUpdateEvent = (updatedEvent: Event) => {
+    setEvents((prevEvents) =>
+      prevEvents.map((event) => (event.id === updatedEvent.id ? updatedEvent : event))
+    );
+    handleCloseModal();
+  };
 
   if (isLoading) {
     return <Loading />;
@@ -55,13 +97,22 @@ const OrganizerEvents: React.FC = () => {
             <EventCard
               key={event.id}
               event={event}
-              onView={(e) => console.log('Ver detalles del evento:', e)}
+              onView={handleViewDetails}
             />
           ))
         ) : (
           <p className="flex text-center justify-center text-gray-500">No has creado ningún evento.</p>
         )}
       </div>
+
+      {/* Modal para ver detalles */}
+      <ModalViewEvent
+        isOpen={isModalOpen}
+        event={selectedEvent}
+        onClose={handleCloseModal}
+        onDelete={handleDeleteEvent}
+        onUpdate={handleUpdateEvent}
+      />
     </div>
   );
 };
