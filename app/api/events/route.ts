@@ -12,19 +12,18 @@ export async function GET(req: NextRequest) {
 
   try {
     const events = await sql`
-      SELECT
+      SELECT 
         e.idevents AS id,
         e.name,
         e.date,
         e.start_time AS starttime,
         e.end_time AS endtime,
         e.description,
-        e.idsports,
-        e.shared_code AS sharecode,
-        s.name AS sportname
+        s.name AS sportname,
+        e.shared_code AS sharecode
       FROM events e
       LEFT JOIN sports s ON e.idsports = s.idsports
-      WHERE e.idusers = ${userId}
+      WHERE e.idusers = ${userId}; 
     `;
 
     return NextResponse.json(events.rows);
@@ -33,6 +32,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
+
 
 export async function POST(req: NextRequest) {
   try {

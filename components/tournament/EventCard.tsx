@@ -1,16 +1,6 @@
 import React from 'react';
+import { Event } from '@/types/types';
 import { formatDate, formatTime } from '@/utils/formatters';
-
-interface Event {
-  id: number;
-  name: string;
-  date: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  sportName: string;
-  registrationCode?: string; 
-}
 
 interface EventCardProps {
   event: Event;
