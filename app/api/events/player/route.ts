@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
 import { sql } from "@vercel/postgres";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -14,9 +14,18 @@ export async function GET() {
     const userId = session.user.id;
 
     const events = await sql`
-      SELECT e.idevents, e.name, e.date, e.start_time, e.end_time, e.description, e.sportname, er.registration_code
+      SELECT 
+          e.idevents AS id,
+          e.name,
+          e.date,
+          e.start_time AS starttime,
+          e.end_time AS endtime,
+          e.description,
+          s.name AS sportname, -- Columna sportname desde la tabla sports
+          er.registration_code
       FROM events e
       INNER JOIN event_registrations er ON e.idevents = er.idevents
+      LEFT JOIN sports s ON e.idsports = s.idsports -- Relación con sports
       WHERE er.idusers = ${userId}
     `;
 

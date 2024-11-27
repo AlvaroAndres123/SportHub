@@ -6,6 +6,7 @@ import AddButton from '@/components/add';
 import ModalEventPlayer from '@/components/functions/ModalEventPl';
 import ModalEventOrg from '@/components/functions/ModalEventOrg';
 import ModalViewEvent from '@/components/functions/ModalViewEvents';
+import EventCard from '@/components/tournament/EventCard'; 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Loading from '@/app/loading';
@@ -22,17 +23,6 @@ interface Event {
   registrationCode?: string; // Código de inscripción (para eventos registrados)
 }
 
-const formatDate = (dateString: string) => {
-  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
-  return new Intl.DateTimeFormat('en-CA', options).format(new Date(dateString));
-};
-
-const formatTime = (time: string | undefined | null): string => {
-  if (!time || !time.includes(':')) return '-';
-  const [hour = '00', minute = '00'] = time.split(':');
-  return `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`;
-};
-
 const Page = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -41,7 +31,7 @@ const Page = () => {
   const [isViewModalOpen, setViewModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
-  const [registeredEvents, setRegisteredEvents] = useState<Event[]>([]); // Eventos registrados
+  const [registeredEvents, setRegisteredEvents] = useState<Event[]>([]);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [isLoading, setLoading] = useState<boolean>(true);
 
@@ -63,38 +53,17 @@ const Page = () => {
 
         const [allEventsResponse, registeredEventsResponse] = await Promise.all([
           fetch(`/api/events?userId=${session.user.id}`),
-          fetch(`/api/events/player`),
+          fetch(`/api/events/player?userId=${session.user.id}`),
         ]);
 
         if (allEventsResponse.ok) {
           const allEvents = await allEventsResponse.json();
-          setEvents(
-            allEvents.map((event: any) => ({
-              id: event.id,
-              name: event.name,
-              date: event.date,
-              description: event.description,
-              startTime: event.starttime || '-',
-              endTime: event.endtime || '-',
-              sportName: event.sportname || 'Sin asignar',
-            }))
-          );
+          setEvents(allEvents);
         }
 
         if (registeredEventsResponse.ok) {
           const registeredEventsData = await registeredEventsResponse.json();
-          setRegisteredEvents(
-            registeredEventsData.map((event: any) => ({
-              id: event.idevents,
-              name: event.name,
-              date: event.date,
-              description: event.description,
-              startTime: event.start_time,
-              endTime: event.end_time,
-              sportName: event.sportname,
-              registrationCode: event.registration_code, // Incluye el código de registro
-            }))
-          );
+          setRegisteredEvents(registeredEventsData);
         }
       } catch (error) {
         console.error('Error al obtener eventos:', error);
@@ -123,6 +92,11 @@ const Page = () => {
     }
   }, [session, status]);
 
+  const openViewModal = (event: Event) => {
+    setSelectedEvent(event);
+    setViewModalOpen(true);
+  };
+
   if (status === 'loading' || isLoading) {
     return <Loading />;
   }
@@ -147,32 +121,32 @@ const Page = () => {
         <h2 className="text-2xl font-bold mb-4">Todos los Eventos</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {events.map((event) => (
-            <div key={event.id} className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              <h3 className="text-2xl font-semibold text-yellow-600 mb-3">{event.name}</h3>
-              <p className="text-gray-700"><strong>Fecha:</strong> {formatDate(event.date)}</p>
-              <p className="text-gray-700"><strong>Hora:</strong> {formatTime(event.startTime)} a {formatTime(event.endTime)}</p>
-              <p className="text-gray-700"><strong>Deporte:</strong> {event.sportName}</p>
-              <p className="text-gray-600 mt-2">{event.description}</p>
-            </div>
+            <EventCard
+              key={event.id}
+              event={event}
+              onView={openViewModal}
+            />
           ))}
         </div>
 
-        <h2 className="text-2xl font-bold mt-10 mb-4">Mis Eventos Registrados</h2>
-        {registeredEvents.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {registeredEvents.map((event) => (
-              <div key={event.id} className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-                <h3 className="text-2xl font-semibold text-blue-600 mb-3">{event.name}</h3>
-                <p className="text-gray-700"><strong>Fecha:</strong> {formatDate(event.date)}</p>
-                <p className="text-gray-700"><strong>Hora:</strong> {formatTime(event.startTime)} a {formatTime(event.endTime)}</p>
-                <p className="text-gray-700"><strong>Deporte:</strong> {event.sportName}</p>
-                <p className="text-gray-600 mt-2">{event.description}</p>
-                <p className="text-gray-500 mt-2"><strong>Código de Registro:</strong> {event.registrationCode}</p>
+        {userRole === 'Jugador' && (
+          <>
+            <h2 className="text-2xl font-bold mt-10 mb-4">Mis Eventos Registrados</h2>
+            {registeredEvents.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {registeredEvents.map((event) => (
+                  <EventCard
+                    key={event.id}
+                    event={event}
+                    onView={openViewModal}
+                    isRegistered={true}
+                  />
+                ))}
               </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-center text-gray-500">No estás registrado en ningún evento.</p>
+            ) : (
+              <p className="text-center text-gray-500">No estás registrado en ningún evento.</p>
+            )}
+          </>
         )}
       </div>
 
@@ -184,12 +158,19 @@ const Page = () => {
         className="fixed bottom-6 right-6 z-10 bg-yellow-500 text-white p-4 rounded-full shadow-lg hover:bg-yellow-600 transition duration-300 transform hover:scale-110"
       />
 
-      <ModalEventOrg isOpen={isModalOpen} onClose={() => setModalOpen(false)} addEvent={function (event: Event): void {
-        throw new Error('Function not implemented.');
-      } } />
-      <ModalEventPlayer isOpen={isPlayerModalOpen} onClose={() => setPlayerModalOpen(false)} registerForEvent={function (registrationCode: string): Promise<void> {
-        throw new Error('Function not implemented.');
-      } } />
+      <ModalEventOrg isOpen={isModalOpen} onClose={() => setModalOpen(false)} addEvent={() => {}} />
+      <ModalEventPlayer
+        isOpen={isPlayerModalOpen}
+        onClose={() => setPlayerModalOpen(false)}
+        registerForEvent={async () => {}}
+      />
+      <ModalViewEvent
+        isOpen={isViewModalOpen}
+        event={selectedEvent}
+        onClose={() => setViewModalOpen(false)}
+        onDelete={() => {}}
+        onUpdate={() => {}}
+      />
     </div>
   );
 };
