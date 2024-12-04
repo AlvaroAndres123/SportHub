@@ -23,6 +23,8 @@ interface Event {
   sportName: string;
 }
 
+
+
 const Page = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -38,6 +40,8 @@ const Page = () => {
       router.push('/');
     }
   }, [status, router]);
+
+  
 
   useEffect(() => {
     const fetchUserRole = async () => {
@@ -108,7 +112,7 @@ const Page = () => {
       <ModalEventPlayer
         isOpen={isPlayerModalOpen}
         onClose={() => setPlayerModalOpen(false)}
-        registerForEvent={async () => {}}
+
       />
       <ModalViewEvent
         isOpen={isViewModalOpen}

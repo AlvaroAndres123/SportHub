@@ -5,12 +5,12 @@ import React, { useState } from 'react';
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  registerForEvent: (registrationCode: string) => Promise<void>; // Asegúrate que sea una función async
 }
 
-const ModalEventPlayer: React.FC<ModalProps> = ({ isOpen, onClose, registerForEvent }) => {
+const ModalEventPlayer: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const [registrationCode, setRegistrationCode] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRegistrationCode(e.target.value);
@@ -21,15 +21,33 @@ const ModalEventPlayer: React.FC<ModalProps> = ({ isOpen, onClose, registerForEv
 
     if (!registrationCode) {
       setError('Por favor, ingresa un código de registro.');
+      setSuccessMessage(null); // Limpiar mensajes previos
       return;
     }
 
     try {
-      await registerForEvent(registrationCode); // Llamamos la función asincrónica aquí
-      setError(null);
-      onClose(); 
-    } catch (error) {
-      setError('Hubo un error al registrar tu participación. Intenta nuevamente.');
+      const response = await fetch('/api/events/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ registrationCode }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Hubo un error al registrar tu participación.');
+      }
+
+      setError(null); // Limpiar errores previos
+      setSuccessMessage('¡Registro exitoso!');
+      setRegistrationCode(''); // Limpiar el código de registro
+      setTimeout(() => {
+        onClose(); // Cerrar modal después de un tiempo
+      }, 2000);
+    } catch (error: any) {
+      setSuccessMessage(null); // Limpiar mensajes de éxito
+      setError(error.message || 'Hubo un error al registrar tu participación.');
     }
   };
 
@@ -39,10 +57,16 @@ const ModalEventPlayer: React.FC<ModalProps> = ({ isOpen, onClose, registerForEv
         <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl text-gray-800">Registrarse en el Evento</h2>
-            <button onClick={onClose} className="text-gray-600 hover:text-gray-800 text-2xl">&times;</button>
+            <button
+              onClick={onClose}
+              className="text-gray-600 hover:text-gray-800 text-2xl"
+            >
+              &times;
+            </button>
           </div>
 
           {error && <div className="text-red-500 text-center mb-4">{error}</div>}
+          {successMessage && <div className="text-green-500 text-center mb-4">{successMessage}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1">
