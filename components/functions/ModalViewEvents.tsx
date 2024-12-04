@@ -25,6 +25,7 @@ interface ModalViewEventProps {
   onClose: () => void;
   onDelete: (eventId: number) => void;
   onUpdate: (updatedEvent: Event) => void;
+  isOrganizer: boolean; // Nueva prop para determinar si el usuario es organizador
 }
 
 const formatDate = (dateString: string) => {
@@ -44,6 +45,7 @@ const ModalViewEvent: React.FC<ModalViewEventProps> = ({
   onClose,
   onDelete,
   onUpdate,
+  isOrganizer,
 }) => {
   const [isEditing, setEditing] = useState(false);
   const [formData, setFormData] = useState<Event | null>(event);
@@ -56,16 +58,11 @@ const ModalViewEvent: React.FC<ModalViewEventProps> = ({
           const response = await fetch(`/api/events/registrations?eventId=${event.id}`);
           if (response.ok) {
             const data = await response.json();
-            console.log('Datos recibidos desde la API:', data);
-  
             const mappedData = data.map((item: any) => ({
-              id: item.id, // Esto parece correcto
-              userName: item.username, // Cambia para coincidir con la clave del API
-              userEmail: item.useremail, // Cambia para coincidir con la clave del API
+              id: item.id,
+              userName: item.username,
+              userEmail: item.useremail,
             }));
-            
-            console.log('Datos mapeados para jugadores inscritos:', mappedData);
-  
             setJoinRequests(mappedData);
           } else {
             console.error('Error al obtener jugadores inscritos:', response.statusText);
@@ -74,11 +71,10 @@ const ModalViewEvent: React.FC<ModalViewEventProps> = ({
           console.error('Error al llamar al API de jugadores inscritos:', error);
         }
       };
-  
+
       fetchJoinRequests();
     }
   }, [event]);
-  
 
   const handleEditToggle = () => {
     setEditing(!isEditing);
@@ -164,6 +160,14 @@ const ModalViewEvent: React.FC<ModalViewEventProps> = ({
             <p className="text-gray-700">
               <strong className="text-yellow-600">Deporte:</strong> {event.sportName}
             </p>
+
+            {/* Mostrar código de registro si es organizador */}
+            {isOrganizer && event.shareCode && (
+              <p className="text-gray-700">
+                <strong className="text-yellow-600">Código para compartir:</strong>{' '}
+                <span className="bg-gray-100 text-gray-800 p-1 rounded">{event.shareCode}</span>
+              </p>
+            )}
 
             {/* Mostrar jugadores inscritos */}
             {joinRequests.length > 0 && (

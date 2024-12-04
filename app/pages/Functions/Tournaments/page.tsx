@@ -7,6 +7,7 @@ import ModalEventPlayer from '@/components/functions/ModalEventPl';
 import ModalEventOrg from '@/components/functions/ModalEventOrg';
 import ModalViewEvent from '@/components/functions/ModalViewEvents';
 import OrganizerEvents from '@/components/tournament/OrganizerEvent';
+import PlayerEvents from '@/components/tournament/PlayerEvents';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Loading from '@/app/loading';
@@ -92,6 +93,7 @@ const Page = () => {
 
       <div className="mt-8 mx-4 lg:mx-16">
         {userRole === 'Organizador' && <OrganizerEvents />}
+        {userRole === 'Jugador' && <PlayerEvents />}
       </div>
 
       <AddButton
@@ -112,9 +114,8 @@ const Page = () => {
         isOpen={isViewModalOpen}
         event={selectedEvent}
         onClose={() => setViewModalOpen(false)}
-        onDelete={() => {}}
-        onUpdate={() => {}}
-      />
+        onDelete={() => { } }
+        onUpdate={() => { } } isOrganizer={false}      />
     </div>
   );
 };

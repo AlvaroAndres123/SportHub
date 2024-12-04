@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const sharedCode = nanoid(8); // Genera un código único de 8 caracteres
+    const sharedCode = nanoid(8); 
 
     const result = await sql`
       INSERT INTO events (name, date, description, idsports, start_time, end_time, idusers, shared_code)

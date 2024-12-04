@@ -32,7 +32,7 @@ const OrganizerEvents: React.FC = () => {
           startTime: event.starttime,
           endTime: event.endtime,
           sportName: event.sportname,
-          shareCode: event.sharecode, // Asegúrate de que este campo venga del API
+          shareCode: event.sharecode, 
         }));
         setEvents(mappedEvents);
       } else {
@@ -111,8 +111,8 @@ const OrganizerEvents: React.FC = () => {
         event={selectedEvent}
         onClose={handleCloseModal}
         onDelete={handleDeleteEvent}
-        onUpdate={handleUpdateEvent}
-      />
+        onUpdate={handleUpdateEvent} 
+        isOrganizer={false}      />
     </div>
   );
 };
