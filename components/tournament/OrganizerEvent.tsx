@@ -12,7 +12,7 @@ const OrganizerEvents: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Estado para manejar el modal
+
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
@@ -32,8 +32,9 @@ const OrganizerEvents: React.FC = () => {
           startTime: event.starttime,
           endTime: event.endtime,
           sportName: event.sportname,
-          shareCode: event.sharecode, 
+          sharedCode: event.sharecode, 
         }));
+        
         setEvents(mappedEvents);
       } else {
         console.error('Error al obtener eventos del organizador:', response.statusText);
@@ -94,6 +95,7 @@ const OrganizerEvents: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {events.length > 0 ? (
           events.map((event) => (
+            
             <EventCard
               key={event.id}
               event={event}

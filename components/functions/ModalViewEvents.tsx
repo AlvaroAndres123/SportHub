@@ -62,6 +62,7 @@ const ModalViewEvent: React.FC<ModalViewEventProps> = ({
               id: item.id,
               userName: item.username,
               userEmail: item.useremail,
+              sharedCOde: item.SharedCode
             }));
             setJoinRequests(mappedData);
           } else {
@@ -164,7 +165,7 @@ const ModalViewEvent: React.FC<ModalViewEventProps> = ({
             {/* Mostrar código de registro si es organizador */}
             {isOrganizer && event.shareCode && (
               <p className="text-gray-700">
-                <strong className="text-yellow-600">Código para compartir:</strong>{' '}
+                <strong className="text-yellow-600">Código:</strong>{' '}
                 <span className="bg-gray-100 text-gray-800 p-1 rounded">{event.shareCode}</span>
               </p>
             )}

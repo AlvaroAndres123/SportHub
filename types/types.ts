@@ -7,6 +7,6 @@ export interface Event {
     startTime: string;
     endTime: string;
     sportName: string;
-    registrationCode?: string; // Opcional para eventos registrados
+    sharedCode?: string; 
   }
   
