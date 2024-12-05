@@ -10,3 +10,12 @@ export interface Event {
     sharedCode?: string; 
   }
   
+
+  export interface Team {
+    idteams: number;
+    team_name: string;
+    team_description: string;
+    team_status: string;
+    shared_code?: string;
+    created_at?: string;
+  }

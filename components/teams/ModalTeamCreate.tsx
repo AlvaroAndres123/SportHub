@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
+  userId: string; // Recibe el ID del usuario como prop
 }
 
-const ModalTeamCreate = ({ isOpen, onClose }: ModalProps) => {
+const ModalTeamCreate: React.FC<ModalProps> = ({ isOpen, onClose, userId }) => {
   const [teamName, setTeamName] = useState('');
   const [teamDescription, setTeamDescription] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +28,7 @@ const ModalTeamCreate = ({ isOpen, onClose }: ModalProps) => {
         body: JSON.stringify({
           team_name: teamName,
           team_description: teamDescription,
+          user_id: userId, // Envía el userId al backend
         }),
       });
 
@@ -35,10 +37,8 @@ const ModalTeamCreate = ({ isOpen, onClose }: ModalProps) => {
         setSuccessMessage('¡Equipo creado exitosamente!');
         setTeamName('');
         setTeamDescription('');
-
-          onClose();
-          window.location.reload(); 
-    
+        onClose(); // Cierra el modal
+        window.location.reload(); // Recarga la página
       } else {
         const data = await response.json();
         setError(data.error || 'Hubo un error al crear el equipo.');
@@ -72,12 +72,20 @@ const ModalTeamCreate = ({ isOpen, onClose }: ModalProps) => {
           placeholder="Descripción del equipo"
           className="w-full p-2 mb-4 border rounded"
         />
-        <button onClick={handleCreateTeam} className="bg-yellow-500 text-white p-2 rounded">
-          Crear Equipo
-        </button>
-        <button onClick={onClose} className="ml-4 p-2 text-gray-500">
-          Cerrar
-        </button>
+        <div className="flex justify-end">
+          <button
+            onClick={handleCreateTeam}
+            className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+          >
+            Crear Equipo
+          </button>
+          <button
+            onClick={onClose}
+            className="ml-4 px-4 py-2 text-gray-500 hover:text-gray-700"
+          >
+            Cerrar
+          </button>
+        </div>
       </div>
     </div>
   );
