@@ -39,62 +39,66 @@ const ModalEventPlayer: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         throw new Error(data.message || 'Hubo un error al registrar tu participación.');
       }
 
-      setError(null); 
+      setError(null);
       setSuccessMessage('¡Registro exitoso!');
-      setRegistrationCode(''); 
+      setRegistrationCode('');
 
-      setTimeout(() => {
-        onClose(); 
-        window.location.reload(); 
-      }, 2000);
+    
+        onClose();
+        window.location.reload(); // Recargar la página después de cerrar el modal
+      
     } catch (error: any) {
-      setSuccessMessage(null); 
+      setSuccessMessage(null);
       setError(error.message || 'Hubo un error al registrar tu participación.');
     }
   };
 
-  return (
-    isOpen ? (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl text-gray-800">Registrarse en el Evento</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-600 hover:text-gray-800 text-2xl"
-            >
-              &times;
-            </button>
+  return isOpen ? (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl text-gray-800">Registrarse en el Evento</h2>
+          <button
+            onClick={() => {
+              onClose();
+              setError(null);
+              setSuccessMessage(null);
+            }}
+            className="text-gray-600 hover:text-gray-800 text-2xl"
+          >
+            &times;
+          </button>
+        </div>
+
+        {error && <div className="text-red-500 text-center mb-4">{error}</div>}
+        {successMessage && <div className="text-green-500 text-center mb-4">{successMessage}</div>}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1">
+            <label htmlFor="registrationCode" className="text-gray-700">
+              Código de Registro
+            </label>
+            <input
+              type="text"
+              id="registrationCode"
+              name="registrationCode"
+              value={registrationCode}
+              onChange={handleChange}
+              placeholder="Ingresa el código de registro"
+              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            />
           </div>
 
-          {error && <div className="text-red-500 text-center mb-4">{error}</div>}
-          {successMessage && <div className="text-green-500 text-center mb-4">{successMessage}</div>}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1">
-              <label htmlFor="registrationCode" className="text-gray-700">Código de Registro</label>
-              <input
-                type="text"
-                id="registrationCode"
-                name="registrationCode"
-                value={registrationCode}
-                onChange={handleChange}
-                placeholder="Ingresa el código de registro"
-                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-2 mt-4 bg-yellow-400 text-gray-800 font-semibold rounded-lg hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-            >
-              Registrar Participación
-            </button>
-          </form>
-        </div>
+          <button
+            type="submit"
+            className="w-full py-2 mt-4 bg-yellow-400 text-gray-800 font-semibold rounded-lg hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+          >
+            Registrar Participación
+          </button>
+        </form>
       </div>
-    ) : null
-  );
+    </div>
+  ) : null;
 };
 
 export default ModalEventPlayer;

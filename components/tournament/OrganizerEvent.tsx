@@ -11,8 +11,6 @@ const OrganizerEvents: React.FC = () => {
   const { data: session } = useSession();
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
@@ -32,9 +30,7 @@ const OrganizerEvents: React.FC = () => {
           startTime: event.starttime,
           endTime: event.endtime,
           sportName: event.sportname,
-          sharedCode: event.sharecode, 
         }));
-        
         setEvents(mappedEvents);
       } else {
         console.error('Error al obtener eventos del organizador:', response.statusText);
@@ -79,11 +75,12 @@ const OrganizerEvents: React.FC = () => {
     }
   };
 
-  const handleUpdateEvent = (updatedEvent: Event) => {
+  const handleUpdateEvent = async (updatedEvent: Event) => {
     setEvents((prevEvents) =>
       prevEvents.map((event) => (event.id === updatedEvent.id ? updatedEvent : event))
     );
     handleCloseModal();
+    await fetchOrganizerEvents(); // Refresca la lista de eventos después de actualizar
   };
 
   if (isLoading) {
@@ -95,7 +92,6 @@ const OrganizerEvents: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {events.length > 0 ? (
           events.map((event) => (
-            
             <EventCard
               key={event.id}
               event={event}
@@ -114,7 +110,8 @@ const OrganizerEvents: React.FC = () => {
         onClose={handleCloseModal}
         onDelete={handleDeleteEvent}
         onUpdate={handleUpdateEvent} 
-        isOrganizer={false}      />
+        isOrganizer
+      />
     </div>
   );
 };

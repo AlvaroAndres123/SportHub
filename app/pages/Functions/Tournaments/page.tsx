@@ -5,7 +5,6 @@ import Navbar from "@/components/navbar";
 import AddButton from '@/components/add';
 import ModalEventPlayer from '@/components/functions/ModalEventPl';
 import ModalEventOrg from '@/components/functions/ModalEventOrg';
-import ModalViewEvent from '@/components/functions/ModalViewEvents';
 import OrganizerEvents from '@/components/tournament/OrganizerEvent';
 import PlayerEvents from '@/components/tournament/PlayerEvents';
 import { useSession } from 'next-auth/react';
@@ -13,36 +12,22 @@ import { useRouter } from 'next/navigation';
 import Loading from '@/app/loading';
 import Link from 'next/link';
 
-interface Event {
-  id: number;
-  name: string;
-  date: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  sportName: string;
-}
-
-
-
 const Page = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isPlayerModalOpen, setPlayerModalOpen] = useState(false);
-  const [isViewModalOpen, setViewModalOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [isLoading, setLoading] = useState<boolean>(true);
 
+  // Redirigir si el usuario no está autenticado
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/');
     }
   }, [status, router]);
 
-  
-
+  // Obtener el rol del usuario
   useEffect(() => {
     const fetchUserRole = async () => {
       if (!session?.user?.id) return;
@@ -52,6 +37,8 @@ const Page = () => {
         if (response.ok) {
           const data = await response.json();
           setUserRole(data.role || null);
+        } else {
+          console.error('Error al obtener el rol del usuario:', response.statusText);
         }
       } catch (error) {
         console.error('Error al obtener el rol del usuario:', error);
@@ -64,11 +51,6 @@ const Page = () => {
       fetchUserRole();
     }
   }, [session, status]);
-
-  const openViewModal = (event: Event) => {
-    setSelectedEvent(event);
-    setViewModalOpen(true); 
-  };
 
   if (status === 'loading' || isLoading) {
     return <Loading />;
@@ -108,22 +90,16 @@ const Page = () => {
         className="fixed bottom-6 right-6 z-10 bg-yellow-500 text-white p-4 rounded-full shadow-lg hover:bg-yellow-600 transition duration-300 transform hover:scale-110"
       />
 
-<ModalEventOrg
-  isOpen={isModalOpen}
-  onClose={() => setModalOpen(false)}
-/>
+      <ModalEventOrg
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        
+      />
 
       <ModalEventPlayer
         isOpen={isPlayerModalOpen}
         onClose={() => setPlayerModalOpen(false)}
-
       />
-      <ModalViewEvent
-        isOpen={isViewModalOpen}
-        event={selectedEvent}
-        onClose={() => setViewModalOpen(false)}
-        onDelete={() => { } }
-        onUpdate={() => { } } isOrganizer={false}      />
     </div>
   );
 };

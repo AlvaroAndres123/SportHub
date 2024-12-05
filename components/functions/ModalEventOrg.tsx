@@ -16,10 +16,12 @@ interface Event {
 
 interface ModalProps {
   isOpen: boolean;
-  onClose: () => void; 
+  onClose: () => void;
+  onUpdate?: (updatedEvent: Event) => void; // Notifica cambios al padre
+  eventToEdit?: Event | null; // Evento a editar
 }
 
-const ModalEvent: React.FC<ModalProps> = ({ isOpen, onClose}) => {
+const ModalEventOrg: React.FC<ModalProps> = ({ isOpen, onClose, onUpdate, eventToEdit }) => {
   const { data: session } = useSession();
   const [formData, setFormData] = useState({
     name: '',
@@ -32,6 +34,29 @@ const ModalEvent: React.FC<ModalProps> = ({ isOpen, onClose}) => {
 
   const [sports, setSports] = useState<{ id: number; name: string }[]>([]);
   const [isLoadingSports, setIsLoadingSports] = useState(true);
+
+  // Cargar datos del evento para edición
+  useEffect(() => {
+    if (eventToEdit) {
+      setFormData({
+        name: eventToEdit.name,
+        date: eventToEdit.date,
+        description: eventToEdit.description,
+        sport: eventToEdit.sport,
+        startTime: eventToEdit.startTime,
+        endTime: eventToEdit.endTime,
+      });
+    } else {
+      setFormData({
+        name: '',
+        date: '',
+        description: '',
+        sport: '',
+        startTime: '',
+        endTime: '',
+      });
+    }
+  }, [eventToEdit]);
 
   // Cargar deportes desde la API
   useEffect(() => {
@@ -77,8 +102,8 @@ const ModalEvent: React.FC<ModalProps> = ({ isOpen, onClose}) => {
     }
   
     try {
-      const newEvent: Event = {
-        id: Date.now(),
+      const updatedEvent: Event = {
+        id: eventToEdit ? eventToEdit.id : Date.now(), // Usar ID existente o generar uno nuevo
         name: formData.name,
         date: formData.date,
         description: formData.description,
@@ -88,23 +113,29 @@ const ModalEvent: React.FC<ModalProps> = ({ isOpen, onClose}) => {
         sportName: selectedSport.name,
       };
   
-      const response = await fetch('/api/events', {
-        method: 'POST',
+      const url = eventToEdit ? `/api/events/${eventToEdit.id}` : '/api/events';
+      const method = eventToEdit ? 'PUT' : 'POST';
+  
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...newEvent, idusers: session?.user?.id }),
+        body: JSON.stringify({ ...updatedEvent, idusers: session?.user?.id }),
       });
   
       if (!response.ok) {
-        throw new Error('Error al crear el evento');
+        throw new Error(`Error al ${eventToEdit ? 'actualizar' : 'crear'} el evento`);
       }
   
-      // Forzar la recarga de la página después de crear el evento
+      alert(`Evento ${eventToEdit ? 'actualizado' : 'creado'} con éxito.`);
+      onClose();
+  
+      // Recargar la página después de cerrar el modal
       window.location.reload();
     } catch (error) {
-      console.error('No se pudo crear el evento:', error);
-      alert('No se pudo crear el evento. Intenta nuevamente.');
+      console.error(`No se pudo ${eventToEdit ? 'actualizar' : 'crear'} el evento:`, error);
+      alert(`No se pudo ${eventToEdit ? 'actualizar' : 'crear'} el evento. Intenta nuevamente.`);
     }
   };
   
@@ -113,7 +144,7 @@ const ModalEvent: React.FC<ModalProps> = ({ isOpen, onClose}) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl text-gray-800">Crear Evento</h2>
+          <h2 className="text-xl text-gray-800">{eventToEdit ? 'Editar Evento' : 'Crear Evento'}</h2>
           <button onClick={onClose} className="text-gray-600 hover:text-gray-800 text-2xl">
             &times;
           </button>
@@ -219,7 +250,7 @@ const ModalEvent: React.FC<ModalProps> = ({ isOpen, onClose}) => {
             type="submit"
             className="w-full py-2 mt-4 bg-yellow-400 text-gray-800 font-semibold rounded-lg hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400"
           >
-            Guardar Evento
+            {eventToEdit ? 'Guardar Cambios' : 'Crear Evento'}
           </button>
         </form>
       </div>
@@ -227,4 +258,4 @@ const ModalEvent: React.FC<ModalProps> = ({ isOpen, onClose}) => {
   ) : null;
 };
 
-export default ModalEvent;
+export default ModalEventOrg;

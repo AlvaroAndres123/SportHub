@@ -25,7 +25,7 @@ interface ModalViewEventProps {
   onClose: () => void;
   onDelete: (eventId: number) => void;
   onUpdate: (updatedEvent: Event) => void;
-  isOrganizer: boolean; // Nueva prop para determinar si el usuario es organizador
+  isOrganizer: boolean; 
 }
 
 const formatDate = (dateString: string) => {
