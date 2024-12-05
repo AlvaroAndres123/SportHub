@@ -5,7 +5,7 @@ interface ModalProps {
   onClose: () => void;
 }
 
-const ModalTeamJoin: React.FC<ModalProps> = ({ isOpen, onClose}) => {
+const ModalTeamJoin: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const [teamCode, setTeamCode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -17,12 +17,12 @@ const ModalTeamJoin: React.FC<ModalProps> = ({ isOpen, onClose}) => {
     }
 
     try {
-      const response = await fetch('/api/teams/join', {
+      const response = await fetch('/api/teams/join', {  // Cambié el endpoint para que coincida con el de registro
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ shared_code: teamCode, user_id: 1 }), // Cambiar user_id por el ID real del usuario
+        body: JSON.stringify({ registrationCode: teamCode }),  // Se usa registrationCode
       });
 
       const data = await response.json();
@@ -30,9 +30,9 @@ const ModalTeamJoin: React.FC<ModalProps> = ({ isOpen, onClose}) => {
       if (response.ok) {
         setError(null);
         setSuccessMessage('¡Te has unido al equipo exitosamente!');
-        setTeamCode('');
+        setTeamCode('');  // Limpiar el campo de código
       } else {
-        setError(data.error || 'Hubo un error al unirse al equipo.');
+        setError(data.message || 'Hubo un error al unirse al equipo.');
       }
     } catch (error) {
       setError('Error al unirse al equipo.');
