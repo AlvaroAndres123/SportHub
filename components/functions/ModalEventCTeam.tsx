@@ -3,10 +3,9 @@ import React, { useState } from 'react';
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  createTeam: (newTeam: { id: number; name: string; members: string[]; description: string }) => Promise<void>;
 }
 
-const ModalTeamCreate = ({ isOpen, onClose, createTeam }: ModalProps) => {
+const ModalTeamCreate = ({ isOpen, onClose }: ModalProps) => {
   const [teamName, setTeamName] = useState('');
   const [teamDescription, setTeamDescription] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -20,24 +19,35 @@ const ModalTeamCreate = ({ isOpen, onClose, createTeam }: ModalProps) => {
     }
 
     try {
-      const newTeam = {
-        id: Math.floor(Math.random() * 1000), 
-        name: teamName,
-        members: [], 
-        description: teamDescription,
-      };
-      await createTeam(newTeam); 
-      setError(null);
-      setSuccessMessage('¡Equipo creado exitosamente!');
-      setTeamName(''); 
-      setTeamDescription('');
+      const response = await fetch('/api/teams', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          team_name: teamName,
+          team_description: teamDescription,
+        }),
+      });
 
-      setTimeout(() => {
-        onClose(); 
-      }, 2000);
-    } catch (error: any) {
-      setSuccessMessage(null);
+      if (response.ok) {
+        setError(null);
+        setSuccessMessage('¡Equipo creado exitosamente!');
+        setTeamName('');
+        setTeamDescription('');
+
+          onClose();
+          window.location.reload(); 
+    
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Hubo un error al crear el equipo.');
+        setSuccessMessage(null);
+      }
+    } catch (error) {
+      console.error('Error al crear equipo:', error);
       setError('Hubo un error al crear el equipo. Intenta nuevamente.');
+      setSuccessMessage(null);
     }
   };
 
@@ -62,8 +72,12 @@ const ModalTeamCreate = ({ isOpen, onClose, createTeam }: ModalProps) => {
           placeholder="Descripción del equipo"
           className="w-full p-2 mb-4 border rounded"
         />
-        <button onClick={handleCreateTeam} className="bg-yellow-500 text-white p-2 rounded">Crear Equipo</button>
-        <button onClick={onClose} className="ml-4 p-2 text-gray-500">Cerrar</button>
+        <button onClick={handleCreateTeam} className="bg-yellow-500 text-white p-2 rounded">
+          Crear Equipo
+        </button>
+        <button onClick={onClose} className="ml-4 p-2 text-gray-500">
+          Cerrar
+        </button>
       </div>
     </div>
   );
