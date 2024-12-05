@@ -39,14 +39,16 @@ const ModalEventPlayer: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         throw new Error(data.message || 'Hubo un error al registrar tu participación.');
       }
 
-      setError(null); // Limpiar errores previos
+      setError(null); 
       setSuccessMessage('¡Registro exitoso!');
-      setRegistrationCode(''); // Limpiar el código de registro
+      setRegistrationCode(''); 
+
       setTimeout(() => {
-        onClose(); // Cerrar modal después de un tiempo
+        onClose(); 
+        window.location.reload(); 
       }, 2000);
     } catch (error: any) {
-      setSuccessMessage(null); // Limpiar mensajes de éxito
+      setSuccessMessage(null); 
       setError(error.message || 'Hubo un error al registrar tu participación.');
     }
   };

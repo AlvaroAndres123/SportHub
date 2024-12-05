@@ -108,7 +108,11 @@ const Page = () => {
         className="fixed bottom-6 right-6 z-10 bg-yellow-500 text-white p-4 rounded-full shadow-lg hover:bg-yellow-600 transition duration-300 transform hover:scale-110"
       />
 
-      <ModalEventOrg isOpen={isModalOpen} onClose={() => setModalOpen(false)} addEvent={() => {}} />
+<ModalEventOrg
+  isOpen={isModalOpen}
+  onClose={() => setModalOpen(false)}
+/>
+
       <ModalEventPlayer
         isOpen={isPlayerModalOpen}
         onClose={() => setPlayerModalOpen(false)}

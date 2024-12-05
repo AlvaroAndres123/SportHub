@@ -11,16 +11,15 @@ interface Event {
   sport: string;
   startTime: string;
   endTime: string;
-  sportName: string; // Nombre del deporte para el frontend
+  sportName: string;
 }
 
 interface ModalProps {
   isOpen: boolean;
-  onClose: () => void;
-  addEvent: (event: Event) => void;
+  onClose: () => void; 
 }
 
-const ModalEvent: React.FC<ModalProps> = ({ isOpen, onClose, addEvent }) => {
+const ModalEvent: React.FC<ModalProps> = ({ isOpen, onClose}) => {
   const { data: session } = useSession();
   const [formData, setFormData] = useState({
     name: '',
@@ -32,7 +31,7 @@ const ModalEvent: React.FC<ModalProps> = ({ isOpen, onClose, addEvent }) => {
   });
 
   const [sports, setSports] = useState<{ id: number; name: string }[]>([]);
-  const [isLoadingSports, setIsLoadingSports] = useState(true); // Estado de carga para deportes
+  const [isLoadingSports, setIsLoadingSports] = useState(true);
 
   // Cargar deportes desde la API
   useEffect(() => {
@@ -48,7 +47,7 @@ const ModalEvent: React.FC<ModalProps> = ({ isOpen, onClose, addEvent }) => {
       } catch (error) {
         console.error('Error en la llamada al API:', error);
       } finally {
-        setIsLoadingSports(false); // Finalizar carga de deportes
+        setIsLoadingSports(false);
       }
     };
 
@@ -65,20 +64,19 @@ const ModalEvent: React.FC<ModalProps> = ({ isOpen, onClose, addEvent }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
+    if (!formData.name || !formData.date || !formData.sport || !formData.startTime || !formData.endTime) {
+      alert('Por favor completa todos los campos obligatorios.');
+      return;
+    }
+  
+    const selectedSport = sports.find((sport) => sport.id.toString() === formData.sport);
+    if (!selectedSport) {
+      alert('Deporte no válido.');
+      return;
+    }
+  
     try {
-      if (!formData.name || !formData.date || !formData.sport || !formData.startTime || !formData.endTime) {
-        alert('Por favor completa todos los campos obligatorios.');
-        return;
-      }
-
-      const selectedSport = sports.find((sport) => sport.id.toString() === formData.sport);
-
-      if (!selectedSport) {
-        alert('Deporte no válido.');
-        return;
-      }
-
       const newEvent: Event = {
         id: Date.now(),
         name: formData.name,
@@ -87,9 +85,9 @@ const ModalEvent: React.FC<ModalProps> = ({ isOpen, onClose, addEvent }) => {
         sport: formData.sport,
         startTime: formData.startTime,
         endTime: formData.endTime,
-        sportName: selectedSport.name, // Agregar nombre del deporte
+        sportName: selectedSport.name,
       };
-
+  
       const response = await fetch('/api/events', {
         method: 'POST',
         headers: {
@@ -97,23 +95,19 @@ const ModalEvent: React.FC<ModalProps> = ({ isOpen, onClose, addEvent }) => {
         },
         body: JSON.stringify({ ...newEvent, idusers: session?.user?.id }),
       });
-
+  
       if (!response.ok) {
         throw new Error('Error al crear el evento');
       }
-
-      const createdEvent = await response.json();
-      addEvent({
-        ...createdEvent,
-        sportName: selectedSport.name, // Asegurar que el deporte dinámico esté presente
-      });
-
-      onClose();
+  
+      // Forzar la recarga de la página después de crear el evento
+      window.location.reload();
     } catch (error) {
-      console.error(error);
+      console.error('No se pudo crear el evento:', error);
       alert('No se pudo crear el evento. Intenta nuevamente.');
     }
   };
+  
 
   return isOpen ? (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -234,4 +228,3 @@ const ModalEvent: React.FC<ModalProps> = ({ isOpen, onClose, addEvent }) => {
 };
 
 export default ModalEvent;
-

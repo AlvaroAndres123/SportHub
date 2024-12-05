@@ -3,21 +3,42 @@ import React, { useState } from 'react';
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  createTeam: (newTeam: { id: number; name: string; members: string[]; description: string }) => void;
+  createTeam: (newTeam: { id: number; name: string; members: string[]; description: string }) => Promise<void>;
 }
 
 const ModalTeamCreate = ({ isOpen, onClose, createTeam }: ModalProps) => {
   const [teamName, setTeamName] = useState('');
   const [teamDescription, setTeamDescription] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const handleCreateTeam = () => {
-    const newTeam = {
-      id: Math.floor(Math.random() * 1000),  // Generar un ID aleatorio para el equipo
-      name: teamName,
-      members: [],  // Inicialmente sin miembros
-      description: teamDescription,
-    };
-    createTeam(newTeam);
+  const handleCreateTeam = async () => {
+    if (!teamName || !teamDescription) {
+      setError('Por favor, completa todos los campos.');
+      setSuccessMessage(null);
+      return;
+    }
+
+    try {
+      const newTeam = {
+        id: Math.floor(Math.random() * 1000), 
+        name: teamName,
+        members: [], 
+        description: teamDescription,
+      };
+      await createTeam(newTeam); 
+      setError(null);
+      setSuccessMessage('¡Equipo creado exitosamente!');
+      setTeamName(''); 
+      setTeamDescription('');
+
+      setTimeout(() => {
+        onClose(); 
+      }, 2000);
+    } catch (error: any) {
+      setSuccessMessage(null);
+      setError('Hubo un error al crear el equipo. Intenta nuevamente.');
+    }
   };
 
   if (!isOpen) return null;
@@ -26,6 +47,8 @@ const ModalTeamCreate = ({ isOpen, onClose, createTeam }: ModalProps) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-8 rounded-lg shadow-lg w-96">
         <h2 className="text-2xl font-bold mb-4">Crear un Nuevo Equipo</h2>
+        {error && <div className="text-red-500 text-center mb-4">{error}</div>}
+        {successMessage && <div className="text-green-500 text-center mb-4">{successMessage}</div>}
         <input
           type="text"
           value={teamName}
